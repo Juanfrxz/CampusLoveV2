@@ -14,12 +14,16 @@ namespace CampusLove.Application.UI
         private readonly UserRepository _userRepository;
         private readonly ProfileRepository _profileRepository;
         private readonly GenderRepository _genderRepository;
+        private readonly ProfessionRepository _professionRepository;
+        private readonly StatusRepository _statusRepository;
 
         public SignUpMenu(MySqlConnection connection)
         {
             _userRepository = new UserRepository(connection);
             _profileRepository = new ProfileRepository(connection);
             _genderRepository = new GenderRepository(connection);
+            _professionRepository = new ProfessionRepository(connection);
+            _statusRepository = new StatusRepository(connection);
         }
 
         public async Task RegisterUser()
@@ -57,19 +61,87 @@ namespace CampusLove.Application.UI
                     return;
                 }
 
-                //Gender ID
+                Console.WriteLine("\n👤 GENDER SELECTION");
+                Console.WriteLine("------------------");
 
-                int professionId = MainMenu.ReadInteger("Register the Profession ID: ");
-                if (professionId <= 0)
+                var genders = await _genderRepository.GetAllAsync();
+
+                if (!genders.Any())
                 {
-                    MainMenu.ShowMessage("Profession ID must be greater than zero.", ConsoleColor.Red);
+                    MainMenu.ShowMessage("❌ Error: No genders available in the system.", ConsoleColor.Red);
                     return;
                 }
 
-                int statusId = MainMenu.ReadInteger("Register the Status ID: ");
-                if (statusId <= 0)
+                // Mostrar la lista de géneros disponibles
+                Console.WriteLine("\nAvailable genders:");
+                foreach (var gender in genders)
                 {
-                    MainMenu.ShowMessage("Status ID must be greater than zero.", ConsoleColor.Red);
+                    Console.WriteLine($"ID: {gender.Id} - {gender.Description}");
+                }
+
+                // Leer el ID ingresado
+                int genderId = MainMenu.ReadInteger("\nSelect your gender ID: ");
+
+                // Validar si el ID existe en la lista
+                var selectedGender = genders.FirstOrDefault(g => g.Id == genderId);
+
+                if (selectedGender == null)
+                {
+                    MainMenu.ShowMessage("❌ Invalid gender ID. Please select an ID from the list.", ConsoleColor.Red);
+                    return;
+                }
+
+                Console.WriteLine("\n👤 PROFESSION SELECTION");
+                Console.WriteLine("------------------");
+
+                var professions = await _professionRepository.GetAllAsync();
+
+                if (!professions.Any())
+                {
+                    MainMenu.ShowMessage("❌ Error: No professions available in the system.", ConsoleColor.Red);
+                    return;
+                }
+                
+                Console.WriteLine("\nAvailable professions:");
+                foreach (var profession in professions)
+                {
+                    Console.WriteLine($"ID: {profession.Id} - {profession.Description}");
+                }
+
+                int professionId = MainMenu.ReadInteger("\nSelect your profession ID: ");
+
+                var selectedProfession = professions.FirstOrDefault(g => g.Id == professionId);
+
+                if (selectedProfession == null)
+                {
+                    MainMenu.ShowMessage("❌ Invalid profession ID. Please select an ID from the list.", ConsoleColor.Red);
+                    return;
+                }
+
+                Console.WriteLine("\n👤 STATUS SELECTION");
+                Console.WriteLine("------------------");
+
+                var statuses = await _statusRepository.GetAllAsync();
+
+                if (!statuses.Any())
+                {
+                    MainMenu.ShowMessage("❌ Error: No statuses available in the system.", ConsoleColor.Red);
+                    return;
+                }
+
+                Console.WriteLine("\nAvailable statuses:");
+                foreach (var status in statuses)
+                {
+                    Console.WriteLine($"ID:  {status.Id} -  {status.Description}");
+                }
+
+                int statusId = MainMenu.ReadInteger("\nSelect your status ID: ");
+
+                var selecteStatus = statuses.FirstOrDefault(g => g.Id == statusId);
+
+                if (selecteStatus == null)
+                {
+                    MainMenu.ShowMessage("❌ Invalid status ID. Please select an ID from the list.", ConsoleColor.Red);
                     return;
                 }
 
@@ -104,6 +176,8 @@ namespace CampusLove.Application.UI
                     if (result)
                     {
                         MainMenu.ShowMessage("\n✅ Profile registered successfully.", ConsoleColor.Green);
+
+
                     }
                     else
                     {

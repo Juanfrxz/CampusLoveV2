@@ -47,7 +47,7 @@ namespace CampusLove.Application.UI
                 switch (option)
                 {
                     case "1":
-                        _signupMenu.RegisterUser();
+                        _signupMenu.RegisterUser().Wait();
                         break;
                     case "2":
                         //---
