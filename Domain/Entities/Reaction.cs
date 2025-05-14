@@ -1,9 +1,9 @@
 namespace CampusLove.Domain.Entities
 {
-    public enum Reaction_type
+    public enum ReactionType
     {
-        like,
-        dislike
+        like = 0,
+        dislike = 1
     }
     public class Reaction
     {
@@ -11,6 +11,6 @@ namespace CampusLove.Domain.Entities
         public int UserId { get; set; }
         public DateTime reactionDate { get; set; }
         public int ProfileId { get; set; }
-        public Reaction_type reaction_type { get; set; }
+        public ReactionType ReactionType { get; set; }
     }
 }
