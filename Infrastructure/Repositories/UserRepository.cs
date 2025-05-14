@@ -135,6 +135,32 @@ namespace CampusLove.Infrastructure.Repositories
                 throw;
             }
         }
+
+        public async Task<User?> GetByUsernameAsync(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                throw new ArgumentException("Username cannot be empty", nameof(username));
+
+            const string query = "SELECT id, username, password, profile_id, birthdate FROM user WHERE username = @Username";
+
+            using var command = new MySqlCommand(query, _connection);
+            command.Parameters.AddWithValue("@Username", username);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return new User
+                {
+                    Id = Convert.ToInt32(reader["id"]),
+                    Username = reader["username"].ToString() ?? string.Empty,
+                    Password = reader["password"].ToString() ?? string.Empty,
+                    ProfileId = Convert.ToInt32(reader["profile_id"]),
+                    Birthdate = Convert.ToDateTime(reader["birthdate"])
+                };
+            }
+
+            return null;
+        }
     }
 
 }
