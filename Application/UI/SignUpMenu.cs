@@ -176,8 +176,84 @@ namespace CampusLove.Application.UI
                     if (result)
                     {
                         MainMenu.ShowMessage("\n✅ Profile registered successfully.", ConsoleColor.Green);
+                        
+                        // Obtener el perfil recién creado
+                        var lastProfile = await _profileRepository.GetLastProfileAsync();
+                        if (lastProfile == null)
+                        {
+                            MainMenu.ShowMessage("\n❌ Error: Could not retrieve profile information.", ConsoleColor.Red);
+                            return;
+                        }
 
+                        Console.Clear();
+                        Console.WriteLine("👤 USER REGISTRATION");
+                        Console.WriteLine("------------------");
 
+                        string username = MainMenu.ReadText("\nUsername: ").Trim();
+                        if (string.IsNullOrEmpty(username))
+                        {
+                            MainMenu.ShowMessage("❌ Username cannot be empty.", ConsoleColor.Red);
+                            return;
+                        }
+
+                        try 
+                        {
+                            var existingUser = await _userRepository.GetByUsernameAsync(username);
+                            if(existingUser != null)
+                            {
+                                MainMenu.ShowMessage("❌ The username already exists.", ConsoleColor.Red);
+                                return;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MainMenu.ShowMessage($"❌ Error validating username: {ex.Message}", ConsoleColor.Red);
+                            return;
+                        }
+                        
+                        string password = MainMenu.ReadText("\nPassword: ").Trim();
+                        if (string.IsNullOrEmpty(password))
+                        {
+                            MainMenu.ShowMessage("❌ Password cannot be empty.", ConsoleColor.Red);
+                            return;
+                        }
+
+                        DateTime birthDate = MainMenu.ReadDate("\nBirthdate (DD/MM/YYYY): ");
+                        if (birthDate > DateTime.Now)
+                        {
+                            MainMenu.ShowMessage("❌ Birthdate cannot be in the future.", ConsoleColor.Red);
+                            return;
+                        }
+
+                        Console.WriteLine("\nUser Information Summary:");
+                        Console.WriteLine($"Username: {username}");
+                        Console.WriteLine($"Birthdate: {birthDate.ToShortDateString()}");
+
+                        string response = MainMenu.ReadText("\nDo you want to register this user? (Y/N): ");
+                        if (response.ToUpper() == "Y")
+                        {
+                            var user = new User
+                            {
+                                Username = username,
+                                Password = password,
+                                Birthdate = birthDate,
+                                ProfileId = lastProfile.Id
+                            };
+
+                            bool userResult = await _userRepository.InsertAsync(user);
+                            if (userResult)
+                            {
+                                MainMenu.ShowMessage("\n✅ User registered successfully!", ConsoleColor.Green);
+                            }
+                            else
+                            {
+                                MainMenu.ShowMessage("\n❌ Error registering user.", ConsoleColor.Red);
+                            }
+                        }
+                        else
+                        {
+                            MainMenu.ShowMessage("\n⚠️ User registration cancelled.", ConsoleColor.Yellow);
+                        }
                     }
                     else
                     {
