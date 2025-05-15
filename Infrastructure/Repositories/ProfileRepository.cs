@@ -37,15 +37,7 @@ namespace CampusLove.Infrastructure.Repositories
                     StatusId = Convert.ToInt32(reader["status_id"]),
                     createDate = Convert.ToDateTime(reader["createDate"]),
                     ProfessionId = Convert.ToInt32(reader["profession_id"]),
-                    TotalLikes = Convert.ToInt32(reader["total_likes"]),
-                    User = new User
-                    {
-                        Id = Convert.ToInt32(reader["id"]),
-                        Username = reader["username"].ToString() ?? string.Empty,
-                        Password = reader["password"].ToString() ?? string.Empty,
-                        ProfileId = Convert.ToInt32(reader["profile_id"]),
-                        Birthdate = Convert.ToDateTime(reader["birthdate"])
-                    }
+                    TotalLikes = Convert.ToInt32(reader["total_likes"])
                 });
             }
 
@@ -57,9 +49,8 @@ namespace CampusLove.Infrastructure.Repositories
             Profile? profile = null;
 
             using var command = new MySqlCommand(@"
-                SELECT p.*, u.username, u.birthdate 
+                SELECT p.* 
                 FROM profile p 
-                LEFT JOIN user u ON p.id = u.profile_id 
                 WHERE p.id = @Id", _connection);
 
             command.Parameters.AddWithValue("@Id", id);
@@ -78,15 +69,7 @@ namespace CampusLove.Infrastructure.Repositories
                     StatusId = Convert.ToInt32(reader["status_id"]),
                     createDate = Convert.ToDateTime(reader["createDate"]),
                     ProfessionId = Convert.ToInt32(reader["profession_id"]),
-                    TotalLikes = Convert.ToInt32(reader["total_likes"]),
-                    User = new User
-                    {
-                        Id = Convert.ToInt32(reader["id"]),
-                        Username = reader["username"].ToString() ?? string.Empty,
-                        Password = reader["password"].ToString() ?? string.Empty,
-                        ProfileId = Convert.ToInt32(reader["profile_id"]),
-                        Birthdate = Convert.ToDateTime(reader["birthdate"])
-                    }
+                    TotalLikes = Convert.ToInt32(reader["total_likes"])
                 };
             }
 
