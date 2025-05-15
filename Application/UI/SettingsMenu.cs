@@ -170,37 +170,52 @@ namespace CampusLove.Application.UI
 
                     int statusId = MainMenu.ReadInteger("\nSelect your status ID: ");
 
-                    var selecteStatus = statuses.FirstOrDefault(g => g.Id == statusId);
+                    var selectedStatus = statuses.FirstOrDefault(g => g.Id == statusId);
 
-                    if (selecteStatus == null)
+                    if (selectedStatus == null)
                     {
                         MainMenu.ShowMessage("❌ Invalid status ID. Please select an ID from the list.", ConsoleColor.Red);
                         return;
                     }
 
+                    // Update the status ID
+                    profile.StatusId = selectedStatus.Id;
+
+                    Console.Clear();
+                    Console.WriteLine("Profile Update Summary:");
+                    Console.WriteLine($"Name: {profile.Name}");
+                    Console.WriteLine($"Lastname: {profile.LastName}");
+                    Console.WriteLine($"Slogan: {profile.Slogan}");
+                    Console.WriteLine($"Status: {selectedStatus.Description}");
+
                     string confirm = MainMenu.ReadText("\nDo you want to save these changes? (Y/N): ");
                     if (confirm.ToUpper() == "Y")
                     {
-                        bool result = await _profileRepository.UpdateAsync(profile);
-                        
-                        if (result)
+                        try 
                         {
-                            MainMenu.ShowMessage("\n✅ Profile updated successfully.", ConsoleColor.Green);
+                            bool result = await _profileRepository.UpdateAsync(profile);
+                            
+                            if (result)
+                            {
+                                MainMenu.ShowMessage("\n✅ Profile updated successfully.", ConsoleColor.Green);
+                            }
+                            else
+                            {
+                                MainMenu.ShowMessage("\n❌ Failed to update the Profile.", ConsoleColor.Red);
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            MainMenu.ShowMessage("\n❌ Failed to update the Profile.", ConsoleColor.Red);
+                            MainMenu.ShowMessage($"\n❌ Database error: {ex.Message}", ConsoleColor.Red);
+                            // Log the full exception details for debugging
+                            Console.WriteLine($"\nDetailed error: {ex}");
                         }
-                    }
-                    else
-                    {
-                        MainMenu.ShowMessage("\n⚠️ Update cancelled.", ConsoleColor.Yellow);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"\n❌ Error updating the information: {ex.Message}", ConsoleColor.Red);
+                MainMenu.ShowMessage($"\n❌ Error updating the information: {ex.Message}", ConsoleColor.Red);
             }
 
             Console.ForegroundColor = ConsoleColor.Yellow;

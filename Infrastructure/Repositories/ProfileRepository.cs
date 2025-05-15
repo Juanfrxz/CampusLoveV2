@@ -111,19 +111,19 @@ namespace CampusLove.Infrastructure.Repositories
 
         public async Task<bool> UpdateAsync(Profile profile)
         {
-            const string query = "UPDATE profile SET name = @Name, lastname = @LastName, gender_id = @GenderId, slogan = Slogan, status_id = @StatusId, profession_id = @ProfessionId, WHERE id = @Id";
+            const string query = "UPDATE profile SET name = @Name, lastname = @LastName, gender_id = @GenderId, slogan = @Slogan, status_id = @StatusId, profession_id = @ProfessionId WHERE id = @Id";
             using var transaction = await _connection.BeginTransactionAsync();
 
-             try
+            try
             {
                 using var command = new MySqlCommand(query, _connection, transaction);
                 command.Parameters.AddWithValue("@Name", profile.Name);
                 command.Parameters.AddWithValue("@LastName", profile.LastName);
                 command.Parameters.AddWithValue("@GenderId", profile.GenderId);
                 command.Parameters.AddWithValue("@Slogan", profile.Slogan);
-                command.Parameters.AddWithValue("@StatusId",
-                profile.StatusId);
+                command.Parameters.AddWithValue("@StatusId", profile.StatusId);
                 command.Parameters.AddWithValue("@ProfessionId", profile.ProfessionId);
+                command.Parameters.AddWithValue("@Id", profile.Id);
 
                 var result = await command.ExecuteNonQueryAsync() > 0;
                 await transaction.CommitAsync();
