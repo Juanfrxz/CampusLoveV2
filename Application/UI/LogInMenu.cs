@@ -32,6 +32,7 @@ namespace CampusLove.Application.UI
             Console.WriteLine("👥 LOG IN");
             Console.WriteLine("Welcome to CampusLove");
             Console.WriteLine("------------------");
+            Console.WriteLine("\nPress TAB to toggle password visibility");
 
             try
             {
@@ -42,21 +43,24 @@ namespace CampusLove.Application.UI
                     return;
                 }
 
-                string password = MainMenu.ReadText("Password: ").Trim();
+                string password = MainMenu.ReadSecurePassword("Password: ").Trim();
                 if (string.IsNullOrWhiteSpace(password))
                 {
                     MainMenu.ShowMessage("❌ Password cannot be empty.", ConsoleColor.Red);
+                    return;
                 }
 
                 var user = await _userRepository.GetByUsernameAsync(username);
                 if (user == null)
                 {
                     MainMenu.ShowMessage("❌ User not found.", ConsoleColor.Red);
+                    return;
                 }
 
                 if (user.Password != password)
                 {
                     MainMenu.ShowMessage("❌ Incorrect password.", ConsoleColor.Red);
+                    return;
                 }
 
                 MainMenu.ShowMessage($"\n✅ Welcome {user.Username}!", ConsoleColor.Green);
