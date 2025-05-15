@@ -54,11 +54,13 @@ namespace CampusLove.Application.UI
                 if (user == null)
                 {
                     MainMenu.ShowMessage("❌ User not found.", ConsoleColor.Red);
+                    return;
                 }
 
                 if (user.Password != password)
                 {
                     MainMenu.ShowMessage("❌ Incorrect password.", ConsoleColor.Red);
+                    return;
                 }
 
                 MainMenu.ShowMessage($"\n✅ Welcome {user.Username}!", ConsoleColor.Green);
