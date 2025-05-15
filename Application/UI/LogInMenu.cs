@@ -28,51 +28,65 @@ namespace CampusLove.Application.UI
 
         public async Task ValidateUser()
         {
-            Console.Clear();
-            Console.WriteLine("👥 LOG IN");
-            Console.WriteLine("Welcome to CampusLove");
-            Console.WriteLine("------------------");
+            bool loginSuccessful = false;
 
-            try
+            while (!loginSuccessful)
             {
-                string username = MainMenu.ReadText("\nUsername: ").Trim();
-                if (string.IsNullOrWhiteSpace(username))
-                {
-                    MainMenu.ShowMessage("❌ Username cannot be empty.", ConsoleColor.Red);
-                    return;
-                }
+                Console.Clear();
+                Console.WriteLine("👥 LOG IN");
+                Console.WriteLine("Welcome to CampusLove");
+                Console.WriteLine("------------------");
+                Console.WriteLine("\nPress TAB to toggle password visibility");
 
-                string password = MainMenu.ReadText("Password: ").Trim();
-                if (string.IsNullOrWhiteSpace(password))
+                try
                 {
-                    MainMenu.ShowMessage("❌ Password cannot be empty.", ConsoleColor.Red);
-                }
+                    string username = MainMenu.ReadText("\nUsername: ").Trim();
+                    string password = MainMenu.ReadSecurePassword("Password: ").Trim();
+                    
+                    if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+                    {
+                        MainMenu.ShowMessage("❌ Fields cannot be empty.", ConsoleColor.Red);
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("\nPress any key to try again...");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        continue;
+                    }
 
-                var user = await _userRepository.GetByUsernameAsync(username);
-                if (user == null)
+                    var user = await _userRepository.GetByUsernameAsync(username);
+                    if (user == null)
+                    {
+                        MainMenu.ShowMessage("❌ User not found.", ConsoleColor.Red);
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("\nPress any key to try again...");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        continue;
+                    }
+
+                    if (user.Password != password)
+                    {
+                        MainMenu.ShowMessage("❌ Incorrect password.", ConsoleColor.Red);
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("\nPress any key to try again...");
+                        Console.ResetColor();
+                        Console.ReadKey();
+                        continue;
+                    }
+
+                    MainMenu.ShowMessage($"\n✅ Welcome {user.Username}!", ConsoleColor.Green);
+                    loginSuccessful = true;
+                    ShowMenu(user);
+                }
+                catch (Exception ex)
                 {
-                    MainMenu.ShowMessage("❌ User not found.", ConsoleColor.Red);
+                    MainMenu.ShowMessage($"\n❌ Error during login: {ex.Message}", ConsoleColor.Red);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write("\nPress any key to try again...");
+                    Console.ResetColor();
+                    Console.ReadKey();
                 }
-
-                if (user.Password != password)
-                {
-                    MainMenu.ShowMessage("❌ Incorrect password.", ConsoleColor.Red);
-                }
-
-                MainMenu.ShowMessage($"\n✅ Welcome {user.Username}!", ConsoleColor.Green);
-                
-                ShowMenu(user);
-                
             }
-            catch (Exception ex)
-            {
-                MainMenu.ShowMessage($"\n❌ Error during login: {ex.Message}", ConsoleColor.Red);
-            }
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write("\nPress any key to continue...");
-            Console.ResetColor();
-            Console.ReadKey();
         }
 
         public void ShowMenu(User currentUser)
@@ -91,9 +105,9 @@ namespace CampusLove.Application.UI
                 Console.WriteLine("  ╠════════════════════════════════════════════╣");
                 Console.WriteLine("  ║     1️⃣  View Profiles             👥        ║");
                 Console.WriteLine("  ║     2️⃣  Interact with Profiles    😍        ║");
-                Console.WriteLine("  ║     3️⃣  View Matches             💞        ║");
-                Console.WriteLine("  ║     4️⃣  Settings                 ⚙️        ║");
-                Console.WriteLine("  ║     0️⃣  Logout                   ❌        ║");
+                Console.WriteLine("  ║     3️⃣  View Matches              💞        ║");
+                Console.WriteLine("  ║     4️⃣  Settings                   ⚙️        ║");
+                Console.WriteLine("  ║     0️⃣  Logout                    ❌        ║");
                 Console.WriteLine("  ╚════════════════════════════════════════════╝");
 
                 Console.ResetColor();
