@@ -46,20 +46,17 @@ namespace CampusLove.Application.UI
                 if (string.IsNullOrWhiteSpace(password))
                 {
                     MainMenu.ShowMessage("❌ Password cannot be empty.", ConsoleColor.Red);
-                    return;
                 }
 
                 var user = await _userRepository.GetByUsernameAsync(username);
                 if (user == null)
                 {
                     MainMenu.ShowMessage("❌ User not found.", ConsoleColor.Red);
-                    return;
                 }
 
                 if (user.Password != password)
                 {
                     MainMenu.ShowMessage("❌ Incorrect password.", ConsoleColor.Red);
-                    return;
                 }
 
                 MainMenu.ShowMessage($"\n✅ Welcome {user.Username}!", ConsoleColor.Green);

@@ -11,6 +11,7 @@ namespace CampusLove.Application.UI
     public class MainMenu
     {
         private readonly SignUpMenu _signupMenu;
+        private readonly LogInMenu _loginMenu;
 
         public MainMenu()
         {
@@ -19,7 +20,7 @@ namespace CampusLove.Application.UI
 
             var connection = DatabaseConfig.GetConnection();
             _signupMenu = new SignUpMenu(connection);
-
+            _loginMenu = new LogInMenu(connection);
         }
 
         public void ShowMenu()
@@ -50,7 +51,7 @@ namespace CampusLove.Application.UI
                         _signupMenu.RegisterUser().Wait();
                         break;
                     case "2":
-                        //---
+                        _loginMenu.ValidateUser().Wait();
                         break;
                     case "0":
                         exit = true;
