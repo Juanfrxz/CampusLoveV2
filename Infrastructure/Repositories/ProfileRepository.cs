@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CampusLove.Domain.Entities;
 using CampusLove.Domain.Ports;
 using MySql.Data.MySqlClient;
+using Dapper;
 
 namespace CampusLove.Infrastructure.Repositories
 {
@@ -197,6 +198,16 @@ namespace CampusLove.Infrastructure.Repositories
             }
 
             return null;
+        }
+
+        public async Task<Profile?> GetByUserIdAsync(int userId)
+        {
+            const string sql = @"
+                SELECT p.* FROM profile p
+                INNER JOIN `user` u ON u.profile_id = p.id
+                WHERE u.id = @UserId";
+
+            return await _connection.QueryFirstOrDefaultAsync<Profile>(sql, new { UserId = userId });
         }
     }
 }

@@ -12,13 +12,16 @@ namespace CampusLove.Application.UI
         private readonly ProfileRepository _profileRepository;
         private readonly GenderRepository _genderRepository;
         private readonly UserRepository _userRepository;
+        private readonly UserLikesRepository _userLikesRepository;
         private int? _preferredGenderId;
+        private const int MAX_LIKES = 10;
 
         public InteractWithProfilesMenu(MySqlConnection connection)
         {
             _profileRepository = new ProfileRepository(connection);
             _genderRepository = new GenderRepository(connection);
             _userRepository = new UserRepository(connection);
+            _userLikesRepository = new UserLikesRepository(connection);
         }
 
         public async Task ShowMenu(User currentUser)
@@ -27,7 +30,7 @@ namespace CampusLove.Application.UI
             while (!returnToMain)
             {
                 Console.Clear();
-                Console.WriteLine("💘 INTERACT WITH PROFILES");
+                Console.WriteLine("💘  INTERACT WITH PROFILES");
                 Console.WriteLine("------------------");
 
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
@@ -77,7 +80,7 @@ namespace CampusLove.Application.UI
         private async Task SelectGenderPreference()
         {
             Console.Clear();
-            Console.WriteLine("♀️♂️ SELECT GENDER PREFERENCE");
+            Console.WriteLine("♀️ ♂️  SELECT GENDER PREFERENCE");
             Console.WriteLine("------------------");
 
             var genders = await _genderRepository.GetAllAsync();
@@ -153,7 +156,7 @@ namespace CampusLove.Application.UI
                 Console.WriteLine($"Found {filteredProfiles.Count} profiles to show.");
                 Console.ReadKey();
 
-                ShowProfiles(filteredProfiles);
+                await ShowProfiles(filteredProfiles, currentUser);
             }
             catch (Exception ex)
             {
@@ -163,7 +166,7 @@ namespace CampusLove.Application.UI
             }
         }
 
-        private void ShowProfiles(List<Profile> profiles)
+        private async Task ShowProfiles(List<Profile> profiles, User currentUser)
         {
             foreach (var profile in profiles)
             {
@@ -176,35 +179,108 @@ namespace CampusLove.Application.UI
                     Console.WriteLine($"Slogan: {profile.Slogan}");
                     Console.WriteLine($"Total Likes: {profile.TotalLikes}");
 
-                    Console.WriteLine("\nOptions:");
-                    Console.WriteLine("1. Like ❤️");
-                    Console.WriteLine("2. Skip ⏭️");
-                    Console.WriteLine("3. Return to Menu ↩️");
+                    // Verificar si ya dio like a este perfil
+                    bool hasLiked = await _userLikesRepository.HasUserLikedProfileAsync(currentUser.Id, profile.Id);
+                    if (hasLiked)
+                    {
+                        Console.WriteLine("\n⚠️ Ya has dado like a este perfil");
+                    }
+                    else
+                    {
+                        // Verificar límite de likes
+                        int likeCount = await _userLikesRepository.GetLikeCountByUserIdAsync(currentUser.Id);
+                        Console.WriteLine($"\nLikes restantes hoy: {MAX_LIKES - likeCount}");
 
-                    string option = MainMenu.ReadText("\nSelect an option: ");
+                        if (likeCount >= MAX_LIKES)
+                        {
+                            Console.WriteLine("\n❌ Has alcanzado el límite de likes por hoy");
+                        }
+                    }
+
+                    Console.WriteLine("\nOpciones:");
+                    Console.WriteLine("1. Like ❤️");
+                    Console.WriteLine("2. Saltar ⏭️");
+                    Console.WriteLine("3. Volver al Menú ↩️");
+
+                    string option = MainMenu.ReadText("\nSelecciona una opción: ");
                     switch (option)
                     {
                         case "1":
-                            // TODO: Implement like functionality
-                            MainMenu.ShowMessage("❤️ You liked this profile!", ConsoleColor.Green);
+                            await HandleLike(currentUser, profile);
                             break;
                         case "2":
                             continue;
                         case "3":
                             return;
                         default:
-                            MainMenu.ShowMessage("⚠️ Invalid option.", ConsoleColor.Red);
+                            MainMenu.ShowMessage("⚠️ Opción inválida.", ConsoleColor.Red);
                             break;
                     }
                     Console.ReadKey();
                 }
                 catch (Exception ex)
                 {
-                    MainMenu.ShowMessage($"❌ Error showing profile: {ex.Message}", ConsoleColor.Red);
-                    Console.WriteLine($"\nDetailed error: {ex}");
+                    MainMenu.ShowMessage($"❌ Error al mostrar el perfil: {ex.Message}", ConsoleColor.Red);
+                    Console.WriteLine($"\nError detallado: {ex}");
                     Console.ReadKey();
                 }
             }
+        }
+
+        private async Task HandleLike(User currentUser, Profile likedProfile)
+        {
+            try
+            {
+                // Verificar si ya dio like
+                bool hasLiked = await _userLikesRepository.HasUserLikedProfileAsync(currentUser.Id, likedProfile.Id);
+                if (hasLiked)
+                {
+                    MainMenu.ShowMessage("⚠️ Ya has dado like a este perfil", ConsoleColor.Yellow);
+                    return;
+                }
+
+                // Verificar límite de likes
+                int likeCount = await _userLikesRepository.GetLikeCountByUserIdAsync(currentUser.Id);
+                if (likeCount >= MAX_LIKES)
+                {
+                    MainMenu.ShowMessage("❌ Has alcanzado el límite de likes por hoy", ConsoleColor.Red);
+                    return;
+                }
+
+                // Crear el like
+                var like = new UserLikes
+                {
+                    UserId = currentUser.Id,
+                    LikedProfileId = likedProfile.Id,
+                    IsMatch = false
+                };
+
+                await _userLikesRepository.CreateLikeAsync(like);
+
+                // Verificar si hay match
+                bool isMatch = await CheckForMatch(currentUser.Id, likedProfile.Id);
+                if (isMatch)
+                {
+                    MainMenu.ShowMessage("🎉 ¡MATCH! ¡Os habéis gustado mutuamente!", ConsoleColor.Green);
+                }
+                else
+                {
+                    MainMenu.ShowMessage("❤️ ¡Like enviado!", ConsoleColor.Green);
+                }
+            }
+            catch (Exception ex)
+            {
+                MainMenu.ShowMessage($"❌ Error al dar like: {ex.Message}", ConsoleColor.Red);
+            }
+        }
+
+        private async Task<bool> CheckForMatch(int userId, int likedProfileId)
+        {
+            // Verificar si el perfil que recibió el like también dio like al usuario
+            var userProfile = await _profileRepository.GetByUserIdAsync(userId);
+            if (userProfile == null) return false;
+
+            return await _userLikesRepository.HasUserLikedProfileAsync(likedProfileId, userProfile.Id);
         }
     }
 } 
