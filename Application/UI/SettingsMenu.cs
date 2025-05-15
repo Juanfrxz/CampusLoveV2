@@ -58,7 +58,7 @@ namespace CampusLove.Application.UI
                             EditProfile(currentUser).Wait();
                             break;
                         case "3":
-                            //ChangePassword(currentUser).Wait();
+                            ChangePassword(currentUser).Wait();
                             break;
                         case "0":
                             returnToMain = true;
@@ -216,6 +216,67 @@ namespace CampusLove.Application.UI
             catch (Exception ex)
             {
                 MainMenu.ShowMessage($"\n❌ Error updating the information: {ex.Message}", ConsoleColor.Red);
+            }
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write("\nPress any key to continue...");
+            Console.ResetColor();
+            Console.ReadKey();
+        }
+
+        private async Task ChangePassword(User currentUser)
+        {
+            Console.Clear();
+            Console.WriteLine("🔑 CHANGE PASSWORD");
+            Console.WriteLine("------------------");
+
+            try
+            {
+                string currentPassword = MainMenu.ReadText("\nEnter your current password: ");
+                if (string.IsNullOrEmpty(currentPassword))
+                {
+                    MainMenu.ShowMessage("❌ Current password cannot be empty.", ConsoleColor.Red);
+                    return;
+                }
+
+                // Verify current password
+                var user = await _userRepository.GetByIdAsync(currentUser.Id);
+                if (user == null || user.Password != currentPassword)
+                {
+                    MainMenu.ShowMessage("❌ Current password is incorrect.", ConsoleColor.Red);
+                    return;
+                }
+
+                string newPassword = MainMenu.ReadText("\nEnter your new password: ");
+                if (string.IsNullOrEmpty(newPassword))
+                {
+                    MainMenu.ShowMessage("❌ New password cannot be empty.", ConsoleColor.Red);
+                    return;
+                }
+
+                string confirmPassword = MainMenu.ReadText("\nConfirm your new password: ");
+                if (newPassword != confirmPassword)
+                {
+                    MainMenu.ShowMessage("❌ Passwords do not match.", ConsoleColor.Red);
+                    return;
+                }
+
+                // Update password
+                user.Password = newPassword;
+                bool result = await _userRepository.UpdateAsync(user);
+
+                if (result)
+                {
+                    MainMenu.ShowMessage("\n✅ Password changed successfully!", ConsoleColor.Green);
+                }
+                else
+                {
+                    MainMenu.ShowMessage("\n❌ Error changing password.", ConsoleColor.Red);
+                }
+            }
+            catch (Exception ex)
+            {
+                MainMenu.ShowMessage($"\n❌ Error: {ex.Message}", ConsoleColor.Red);
             }
 
             Console.ForegroundColor = ConsoleColor.Yellow;

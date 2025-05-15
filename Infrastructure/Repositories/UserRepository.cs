@@ -103,6 +103,7 @@ namespace CampusLove.Infrastructure.Repositories
                 command.Parameters.AddWithValue("@Password", user.Password);
                 command.Parameters.AddWithValue("@ProfileId", user.ProfileId);
                 command.Parameters.AddWithValue("@Birthdate", user.Birthdate);
+                command.Parameters.AddWithValue("@Id", user.Id);
 
                 var result = await command.ExecuteNonQueryAsync() > 0;
                 await transaction.CommitAsync();
