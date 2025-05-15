@@ -30,17 +30,17 @@ namespace CampusLove.Application.UI
             while (!returnToMain)
             {
                 Console.Clear();
-                Console.WriteLine($"⚙️ SETTINGS MENU {currentUser.Username}");
+                Console.WriteLine($"  ⚙️ SETTINGS MENU {currentUser.Username}");
                 Console.WriteLine("------------------");
 
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("  ╔════════════════════════════════════════════╗");
-                Console.WriteLine("  ║              ⚙️ SETTINGS MENU              ║");
+                Console.WriteLine("  ║             ⚙️  SETTINGS MENU               ║");
                 Console.WriteLine("  ╠════════════════════════════════════════════╣");
-                Console.WriteLine("  ║     1️⃣  View Profile              👤        ║");
-                Console.WriteLine("  ║     2️⃣  Edit Profile              ✏️        ║");
-                Console.WriteLine("  ║     3️⃣  Change Password          🔑        ║");
-                Console.WriteLine("  ║     0️⃣  Return to Menu           ↩️        ║");
+                Console.WriteLine("  ║     1️⃣  View Profile             👤         ║");
+                Console.WriteLine("  ║     2️⃣  Edit Profile             ✏️          ║");
+                Console.WriteLine("  ║     3️⃣  Change Password          🔑         ║");
+                Console.WriteLine("  ║     0️⃣  Return to Menu           ↩️          ║");
                 Console.WriteLine("  ╚════════════════════════════════════════════╝");
 
                 Console.ResetColor();
