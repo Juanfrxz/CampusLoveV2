@@ -188,6 +188,7 @@ namespace CampusLove.Application.UI
                         Console.Clear();
                         Console.WriteLine("👤 USER REGISTRATION");
                         Console.WriteLine("------------------");
+                        Console.WriteLine("\nPress TAB to toggle password visibility");
 
                         string username = MainMenu.ReadText("\nUsername: ").Trim();
                         if (string.IsNullOrEmpty(username))
@@ -211,7 +212,7 @@ namespace CampusLove.Application.UI
                             return;
                         }
                         
-                        string password = MainMenu.ReadText("\nPassword: ").Trim();
+                        string password = MainMenu.ReadSecurePassword("\nPassword: ").Trim();
                         if (string.IsNullOrEmpty(password))
                         {
                             MainMenu.ShowMessage("❌ Password cannot be empty.", ConsoleColor.Red);
