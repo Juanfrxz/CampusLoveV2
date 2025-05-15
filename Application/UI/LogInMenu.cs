@@ -16,6 +16,7 @@ namespace CampusLove.Application.UI
         private readonly ProfileRepository _profileRepository;
         private readonly ReactionRepository _reactionRepository;
         private readonly UserMatchRepository _usermatchRepository;
+        private readonly InteractWithProfilesMenu _interactMenu;
 
         public LogInMenu(MySqlConnection connection)
         {
@@ -24,6 +25,7 @@ namespace CampusLove.Application.UI
             _reactionRepository = new ReactionRepository(connection);
             _usermatchRepository = new UserMatchRepository(connection);
             _settingsMenu = new SettingsMenu(connection);
+            _interactMenu = new InteractWithProfilesMenu(connection);
         }
 
         public async Task ValidateUser()
@@ -122,7 +124,7 @@ namespace CampusLove.Application.UI
                             //-
                             break;
                         case "2":
-                            //--
+                            _interactMenu.ShowMenu(currentUser).Wait();
                             break;
                         case "3":
                             //

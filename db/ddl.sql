@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS campusLove;
 CREATE DATABASE IF NOT EXISTS campusLove;
 USE campusLove;
 
@@ -31,7 +32,7 @@ CREATE TABLE IF NOT EXISTS profile (
     status_id INT,
     createDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     profession_id INT,
-    total_likes INT,
+    total_likes INT DEFAULT 0,
     CONSTRAINT gender_id_FK FOREIGN KEY (gender_id) REFERENCES gender(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT status_id_FK FOREIGN KEY (status_id) REFERENCES status(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT profession_id_FK FOREIGN KEY (profession_id) REFERENCES profession(id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -46,14 +47,15 @@ CREATE TABLE IF NOT EXISTS user (
     CONSTRAINT profile_id_FK FOREIGN KEY (profile_id) REFERENCES profile(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS reaction (
+CREATE TABLE IF NOT EXISTS userlikes (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
-    profile_id INT,
-    reaction_type ENUM ('like', 'dislike'),
-    reactionDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT user_id_FK FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT profile_reaction_FK FOREIGN KEY (profile_id) REFERENCES profile(id) ON DELETE CASCADE ON UPDATE CASCADE
+    user_id INT NOT NULL,
+    liked_profile_id INT NOT NULL,
+    like_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_match BOOLEAN DEFAULT FALSE,
+    CONSTRAINT user_likes_FK FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT profile_likes_FK FOREIGN KEY (liked_profile_id) REFERENCES profile(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE KEY unique_like (user_id, liked_profile_id)
 );
 
 CREATE TABLE IF NOT EXISTS interestProfile (
@@ -68,7 +70,7 @@ CREATE TABLE IF NOT EXISTS user_match (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user1_id INT,
     user2_id INT,
-    matchDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    match_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT user1_id_FK FOREIGN KEY (user1_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT user2_id_FK FOREIGN KEY (user2_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -78,9 +80,7 @@ CREATE TABLE IF NOT EXISTS daily_likes (
     date DATE,
     profile_id INT,
     number_likes INT CHECK (number_likes <= 10),
-    status BOOLEAN,
-    CONSTRAINT profile_likes_FK FOREIGN KEY (profile_id) REFERENCES profile(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-
+    status BOOLEAN DEFAULT TRUE,
+    CONSTRAINT profile_daily_likes_FK FOREIGN KEY (profile_id) REFERENCES profile(id) ON DELETE CASCADE ON UPDATE CASCADE
+); 
 

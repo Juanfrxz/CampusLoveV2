@@ -72,17 +72,17 @@ namespace CampusLove.Application.UI
                     return;
                 }
 
-                // Mostrar la lista de géneros disponibles
+                // Show available genders list
                 Console.WriteLine("\nAvailable genders:");
                 foreach (var gender in genders)
                 {
                     Console.WriteLine($"ID: {gender.Id} - {gender.Description}");
                 }
 
-                // Leer el ID ingresado
+                // Read the entered ID
                 int genderId = MainMenu.ReadInteger("\nSelect your gender ID: ");
 
-                // Validar si el ID existe en la lista
+                // Validate if the ID exists in the list
                 var selectedGender = genders.FirstOrDefault(g => g.Id == genderId);
 
                 if (selectedGender == null)
@@ -177,7 +177,7 @@ namespace CampusLove.Application.UI
                     {
                         MainMenu.ShowMessage("\n✅ Profile registered successfully.", ConsoleColor.Green);
                         
-                        // Obtener el perfil recién creado
+                        // Get the newly created profile
                         var lastProfile = await _profileRepository.GetLastProfileAsync();
                         if (lastProfile == null)
                         {

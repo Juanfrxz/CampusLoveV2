@@ -148,6 +148,5 @@ namespace CampusLove.Application.UI
                 ShowMessage("❌ Error: Please enter a valid date (DD/MM/YYYY).", ConsoleColor.Red);
             }
         }
-
     }
 }
