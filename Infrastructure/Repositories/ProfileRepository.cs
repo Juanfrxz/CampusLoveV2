@@ -40,11 +40,11 @@ namespace CampusLove.Infrastructure.Repositories
                     TotalLikes = Convert.ToInt32(reader["total_likes"]),
                     User = new User
                     {
-                        Id = Convert.ToInt32(reader["user_id"]),
-                    Username = reader["username"].ToString() ?? string.Empty,
-                    Password = reader["password"].ToString() ?? string.Empty,
-                    ProfileId = Convert.ToInt32(reader["profile_id"]),
-                    Birthdate = Convert.ToDateTime(reader["birthdate"])
+                        Id = Convert.ToInt32(reader["id"]),
+                        Username = reader["username"].ToString() ?? string.Empty,
+                        Password = reader["password"].ToString() ?? string.Empty,
+                        ProfileId = Convert.ToInt32(reader["profile_id"]),
+                        Birthdate = Convert.ToDateTime(reader["birthdate"])
                     }
                 });
             }
@@ -55,7 +55,12 @@ namespace CampusLove.Infrastructure.Repositories
         public async Task<Profile?> GetByIdAsync(object id)
         {
             Profile? profile = null;
-            using var command = new MySqlCommand(@"SELECT p.*, u.username, u.birthdate FROM profile p INNER JOIN user u ON p.id = u.profile_id WHERE p.id = @Id", _connection);
+
+            using var command = new MySqlCommand(@"
+                SELECT p.*, u.username, u.birthdate 
+                FROM profile p 
+                LEFT JOIN user u ON p.id = u.profile_id 
+                WHERE p.id = @Id", _connection);
 
             command.Parameters.AddWithValue("@Id", id);
 
@@ -76,11 +81,11 @@ namespace CampusLove.Infrastructure.Repositories
                     TotalLikes = Convert.ToInt32(reader["total_likes"]),
                     User = new User
                     {
-                        Id = Convert.ToInt32(reader["user_id"]),
-                    Username = reader["username"].ToString() ?? string.Empty,
-                    Password = reader["password"].ToString() ?? string.Empty,
-                    ProfileId = Convert.ToInt32(reader["profile_id"]),
-                    Birthdate = Convert.ToDateTime(reader["birthdate"])
+                        Id = Convert.ToInt32(reader["id"]),
+                        Username = reader["username"].ToString() ?? string.Empty,
+                        Password = reader["password"].ToString() ?? string.Empty,
+                        ProfileId = Convert.ToInt32(reader["profile_id"]),
+                        Birthdate = Convert.ToDateTime(reader["birthdate"])
                     }
                 };
             }
@@ -123,10 +128,7 @@ namespace CampusLove.Infrastructure.Repositories
 
         public async Task<bool> UpdateAsync(Profile profile)
         {
-            if (profile == null)
-                throw new ArgumentNullException(nameof(profile));
-
-            const string query = "UPDATE profile SET name = @Name, lastname = @LastName, identification = @Identification, gender_id = @GenderId, slogan = Slogan, status_id = @StatusId, createDate = @createDate, profession_id = @ProfessionId, total_likes = @TotalLikes WHERE id = @Id";
+            const string query = "UPDATE profile SET name = @Name, lastname = @LastName, gender_id = @GenderId, slogan = Slogan, status_id = @StatusId, profession_id = @ProfessionId, WHERE id = @Id";
             using var transaction = await _connection.BeginTransactionAsync();
 
              try
@@ -134,14 +136,11 @@ namespace CampusLove.Infrastructure.Repositories
                 using var command = new MySqlCommand(query, _connection, transaction);
                 command.Parameters.AddWithValue("@Name", profile.Name);
                 command.Parameters.AddWithValue("@LastName", profile.LastName);
-                command.Parameters.AddWithValue("@Identification", profile.Identification);
                 command.Parameters.AddWithValue("@GenderId", profile.GenderId);
                 command.Parameters.AddWithValue("@Slogan", profile.Slogan);
                 command.Parameters.AddWithValue("@StatusId",
                 profile.StatusId);
-                command.Parameters.AddWithValue("@createDate", profile.createDate);
                 command.Parameters.AddWithValue("@ProfessionId", profile.ProfessionId);
-                command.Parameters.AddWithValue("@TotalLikes", profile.TotalLikes);
 
                 var result = await command.ExecuteNonQueryAsync() > 0;
                 await transaction.CommitAsync();
