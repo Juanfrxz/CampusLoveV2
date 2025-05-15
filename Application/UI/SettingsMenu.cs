@@ -229,10 +229,11 @@ namespace CampusLove.Application.UI
             Console.Clear();
             Console.WriteLine("🔑 CHANGE PASSWORD");
             Console.WriteLine("------------------");
+            Console.WriteLine("\nPress TAB to toggle password visibility");
 
             try
             {
-                string currentPassword = MainMenu.ReadText("\nEnter your current password: ");
+                string currentPassword = MainMenu.ReadSecurePassword("\nEnter your current password: ");
                 if (string.IsNullOrEmpty(currentPassword))
                 {
                     MainMenu.ShowMessage("❌ Current password cannot be empty.", ConsoleColor.Red);
@@ -247,14 +248,14 @@ namespace CampusLove.Application.UI
                     return;
                 }
 
-                string newPassword = MainMenu.ReadText("\nEnter your new password: ");
+                string newPassword = MainMenu.ReadSecurePassword("\nEnter your new password: ");
                 if (string.IsNullOrEmpty(newPassword))
                 {
                     MainMenu.ShowMessage("❌ New password cannot be empty.", ConsoleColor.Red);
                     return;
                 }
 
-                string confirmPassword = MainMenu.ReadText("\nConfirm your new password: ");
+                string confirmPassword = MainMenu.ReadSecurePassword("\nConfirm your new password: ");
                 if (newPassword != confirmPassword)
                 {
                     MainMenu.ShowMessage("❌ Passwords do not match.", ConsoleColor.Red);
