@@ -179,30 +179,30 @@ namespace CampusLove.Application.UI
                     Console.WriteLine($"Slogan: {profile.Slogan}");
                     Console.WriteLine($"Total Likes: {profile.TotalLikes}");
 
-                    // Verificar si ya dio like a este perfil
+                    // Check if already liked this profile
                     bool hasLiked = await _userLikesRepository.HasUserLikedProfileAsync(currentUser.Id, profile.Id);
                     if (hasLiked)
                     {
-                        Console.WriteLine("\n⚠️ Ya has dado like a este perfil");
+                        Console.WriteLine("\n⚠️ You have already liked this profile");
                     }
                     else
                     {
-                        // Verificar límite de likes
+                        // Check like limit
                         int likeCount = await _userLikesRepository.GetLikeCountByUserIdAsync(currentUser.Id);
-                        Console.WriteLine($"\nLikes restantes hoy: {MAX_LIKES - likeCount}");
+                        Console.WriteLine($"\nRemaining likes today: {MAX_LIKES - likeCount}");
 
                         if (likeCount >= MAX_LIKES)
                         {
-                            Console.WriteLine("\n❌ Has alcanzado el límite de likes por hoy");
+                            Console.WriteLine("\n❌ You have reached your daily like limit");
                         }
                     }
 
-                    Console.WriteLine("\nOpciones:");
+                    Console.WriteLine("\nOptions:");
                     Console.WriteLine("1. Like ❤️");
-                    Console.WriteLine("2. Saltar ⏭️");
-                    Console.WriteLine("3. Volver al Menú ↩️");
+                    Console.WriteLine("2. Skip ⏭️");
+                    Console.WriteLine("3. Return to Menu ↩️");
 
-                    string option = MainMenu.ReadText("\nSelecciona una opción: ");
+                    string option = MainMenu.ReadText("\nSelect an option: ");
                     switch (option)
                     {
                         case "1":
@@ -213,15 +213,15 @@ namespace CampusLove.Application.UI
                         case "3":
                             return;
                         default:
-                            MainMenu.ShowMessage("⚠️ Opción inválida.", ConsoleColor.Red);
+                            MainMenu.ShowMessage("⚠️ Invalid option.", ConsoleColor.Red);
                             break;
                     }
                     Console.ReadKey();
                 }
                 catch (Exception ex)
                 {
-                    MainMenu.ShowMessage($"❌ Error al mostrar el perfil: {ex.Message}", ConsoleColor.Red);
-                    Console.WriteLine($"\nError detallado: {ex}");
+                    MainMenu.ShowMessage($"❌ Error displaying profile: {ex.Message}", ConsoleColor.Red);
+                    Console.WriteLine($"\nDetailed error: {ex}");
                     Console.ReadKey();
                 }
             }
@@ -231,23 +231,23 @@ namespace CampusLove.Application.UI
         {
             try
             {
-                // Verificar si ya dio like
+                // Check if already liked
                 bool hasLiked = await _userLikesRepository.HasUserLikedProfileAsync(currentUser.Id, likedProfile.Id);
                 if (hasLiked)
                 {
-                    MainMenu.ShowMessage("⚠️ Ya has dado like a este perfil", ConsoleColor.Yellow);
+                    MainMenu.ShowMessage("⚠️ You have already liked this profile", ConsoleColor.Yellow);
                     return;
                 }
 
-                // Verificar límite de likes
+                // Check like limit
                 int likeCount = await _userLikesRepository.GetLikeCountByUserIdAsync(currentUser.Id);
                 if (likeCount >= MAX_LIKES)
                 {
-                    MainMenu.ShowMessage("❌ Has alcanzado el límite de likes por hoy", ConsoleColor.Red);
+                    MainMenu.ShowMessage("❌ You have reached your daily like limit", ConsoleColor.Red);
                     return;
                 }
 
-                // Crear el like
+                // Create the like
                 var like = new UserLikes
                 {
                     UserId = currentUser.Id,
@@ -257,26 +257,26 @@ namespace CampusLove.Application.UI
 
                 await _userLikesRepository.CreateLikeAsync(like);
 
-                // Verificar si hay match
+                // Check for match
                 bool isMatch = await CheckForMatch(currentUser.Id, likedProfile.Id);
                 if (isMatch)
                 {
-                    MainMenu.ShowMessage("🎉 ¡MATCH! ¡Os habéis gustado mutuamente!", ConsoleColor.Green);
+                    MainMenu.ShowMessage("🎉 MATCH! You both liked each other!", ConsoleColor.Green);
                 }
                 else
                 {
-                    MainMenu.ShowMessage("❤️ ¡Like enviado!", ConsoleColor.Green);
+                    MainMenu.ShowMessage("❤️ Like sent!", ConsoleColor.Green);
                 }
             }
             catch (Exception ex)
             {
-                MainMenu.ShowMessage($"❌ Error al dar like: {ex.Message}", ConsoleColor.Red);
+                MainMenu.ShowMessage($"❌ Error sending like: {ex.Message}", ConsoleColor.Red);
             }
         }
 
         private async Task<bool> CheckForMatch(int userId, int likedProfileId)
         {
-            // Verificar si el perfil que recibió el like también dio like al usuario
+            // Check if the profile that received the like also liked the user
             var userProfile = await _profileRepository.GetByUserIdAsync(userId);
             if (userProfile == null) return false;
 
