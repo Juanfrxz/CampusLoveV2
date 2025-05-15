@@ -18,30 +18,45 @@ namespace CampusLove.Infrastructure.Repositories
 
         public async Task<IEnumerable<Profile>> GetAllAsync()
         {
-            var profileList = new List<Profile>();
-            const string query = "SELECT id, name, lastname, identification, gender_id, slogan, status_id, createDate, profession_id, total_likes FROM profile";
+            var profiles = new List<Profile>();
+            using var command = _connection.CreateCommand();
+            command.CommandText = "SELECT * FROM profile";
 
-            using var command = new MySqlCommand(query, _connection);
-            using var reader = await command.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
+            try
             {
-                profileList.Add(new Profile
+                if (_connection.State != System.Data.ConnectionState.Open)
                 {
-                    Id = Convert.ToInt32(reader["id"]),
-                    Name = reader["name"].ToString() ?? string.Empty,
-                    LastName = reader["lastname"].ToString() ?? string.Empty,
-                    Identification = reader["identification"].ToString() ?? string.Empty,
-                    GenderId = Convert.ToInt32(reader["gender_id"]),
-                    Slogan = reader["slogan"].ToString() ?? string.Empty,
-                    StatusId = Convert.ToInt32(reader["status_id"]),
-                    createDate = Convert.ToDateTime(reader["createDate"]),
-                    ProfessionId = Convert.ToInt32(reader["profession_id"]),
-                    TotalLikes = Convert.ToInt32(reader["total_likes"])
-                });
+                    await _connection.OpenAsync();
+                }
+                
+                using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    var profile = new Profile
+                    {
+                        Id = reader["id"] == DBNull.Value ? 0 : Convert.ToInt32(reader["id"]),
+                        Name = reader["name"]?.ToString() ?? string.Empty,
+                        LastName = reader["lastname"]?.ToString() ?? string.Empty,
+                        Identification = reader["identification"]?.ToString() ?? string.Empty,
+                        Slogan = reader["slogan"]?.ToString() ?? string.Empty,
+                        GenderId = reader["gender_id"] == DBNull.Value ? 0 : Convert.ToInt32(reader["gender_id"]),
+                        ProfessionId = reader["profession_id"] == DBNull.Value ? 0 : Convert.ToInt32(reader["profession_id"]),
+                        StatusId = reader["status_id"] == DBNull.Value ? 0 : Convert.ToInt32(reader["status_id"]),
+                        TotalLikes = reader["total_likes"] == DBNull.Value ? 0 : Convert.ToInt32(reader["total_likes"]),
+                        createDate = reader["createDate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["createDate"])
+                    };
+                    profiles.Add(profile);
+                }
+            }
+            finally
+            {
+                if (_connection.State == System.Data.ConnectionState.Open)
+                {
+                    await _connection.CloseAsync();
+                }
             }
 
-            return profileList;
+            return profiles;
         }
 
         public async Task<Profile?> GetByIdAsync(object id)

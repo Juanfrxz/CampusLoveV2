@@ -23,11 +23,6 @@ namespace CampusLove.Application.UI
 
         public async Task ShowMenu(User currentUser)
         {
-            if (_preferredGenderId == null)
-            {
-                await SelectGenderPreference();
-            }
-
             bool returnToMain = false;
             while (!returnToMain)
             {
@@ -40,8 +35,8 @@ namespace CampusLove.Application.UI
                 Console.WriteLine("  ║           💘 INTERACT WITH PROFILES        ║");
                 Console.WriteLine("  ╠════════════════════════════════════════════╣");
                 Console.WriteLine("  ║     1️⃣  Browse Profiles           👥        ║");
-                Console.WriteLine("  ║     2️⃣  Change Gender Preference  ♀️♂️       ║");
-                Console.WriteLine("  ║     0️⃣  Return to Menu           ↩️        ║");
+                Console.WriteLine("  ║     2️⃣  Change Gender Preference  ♀️ ♂️       ║");
+                Console.WriteLine("  ║     0️⃣  Return to Menu           ↩️          ║");
                 Console.WriteLine("  ╚════════════════════════════════════════════╝");
 
                 Console.ResetColor();
@@ -53,6 +48,10 @@ namespace CampusLove.Application.UI
                     switch (option)
                     {
                         case "1":
+                            if (_preferredGenderId == null)
+                            {
+                                await SelectGenderPreference();
+                            }
                             await BrowseProfiles(currentUser);
                             break;
                         case "2":
@@ -89,12 +88,22 @@ namespace CampusLove.Application.UI
             }
 
             Console.WriteLine("\nAvailable genders:");
+            Console.WriteLine("ID: 0 - All Genders 🌈");
             foreach (var gender in genders)
             {
                 Console.WriteLine($"ID: {gender.Id} - {gender.Description}");
             }
 
-            int genderId = MainMenu.ReadInteger("\nSelect your preferred gender ID: ");
+            int genderId = MainMenu.ReadInteger("\nSelect your preferred gender ID (0 for all): ");
+            
+            if (genderId == 0)
+            {
+                _preferredGenderId = null; // null means all genders
+                MainMenu.ShowMessage("✅ Gender preference set to: All Genders 🌈", ConsoleColor.Green);
+                Console.ReadKey();
+                return;
+            }
+
             var selectedGender = genders.FirstOrDefault(g => g.Id == genderId);
 
             if (selectedGender == null)
@@ -110,53 +119,91 @@ namespace CampusLove.Application.UI
 
         private async Task BrowseProfiles(User currentUser)
         {
-            if (_preferredGenderId == null)
-            {
-                MainMenu.ShowMessage("❌ Please select a gender preference first.", ConsoleColor.Red);
-                return;
-            }
-
-            var profiles = await _profileRepository.GetAllAsync();
-            var filteredProfiles = profiles
-                .Where(p => p.GenderId == _preferredGenderId && p.Id != currentUser.ProfileId)
-                .ToList();
-
-            if (!filteredProfiles.Any())
-            {
-                MainMenu.ShowMessage("❌ No profiles available matching your preferences.", ConsoleColor.Red);
-                return;
-            }
-
-            foreach (var profile in filteredProfiles)
+            try
             {
                 Console.Clear();
-                Console.WriteLine("👤 PROFILE");
-                Console.WriteLine("------------------");
-                Console.WriteLine($"Name: {profile.Name} {profile.LastName}");
-                Console.WriteLine($"Slogan: {profile.Slogan}");
-                Console.WriteLine($"Total Likes: {profile.TotalLikes}");
-
-                Console.WriteLine("\nOptions:");
-                Console.WriteLine("1. Like ❤️");
-                Console.WriteLine("2. Skip ⏭️");
-                Console.WriteLine("3. Return to Menu ↩️");
-
-                string option = MainMenu.ReadText("\nSelect an option: ");
-                switch (option)
+                Console.WriteLine("👥 Browsing Profiles...");
+                
+                var profiles = await _profileRepository.GetAllAsync();
+                if (profiles == null || !profiles.Any())
                 {
-                    case "1":
-                        // TODO: Implement like functionality
-                        MainMenu.ShowMessage("❤️ You liked this profile!", ConsoleColor.Green);
-                        break;
-                    case "2":
-                        continue;
-                    case "3":
-                        return;
-                    default:
-                        MainMenu.ShowMessage("⚠️ Invalid option.", ConsoleColor.Red);
-                        break;
+                    MainMenu.ShowMessage("❌ No profiles available in the system.", ConsoleColor.Red);
+                    Console.ReadKey();
+                    return;
                 }
+
+                var filteredProfiles = profiles
+                    .Where(p => p != null && p.Id != currentUser.ProfileId)
+                    .ToList();
+
+                if (_preferredGenderId.HasValue)
+                {
+                    filteredProfiles = filteredProfiles
+                        .Where(p => p.GenderId == _preferredGenderId.Value)
+                        .ToList();
+                }
+
+                if (!filteredProfiles.Any())
+                {
+                    MainMenu.ShowMessage("❌ No profiles available matching your preferences.", ConsoleColor.Red);
+                    Console.ReadKey();
+                    return;
+                }
+
+                Console.WriteLine($"Found {filteredProfiles.Count} profiles to show.");
                 Console.ReadKey();
+
+                ShowProfiles(filteredProfiles);
+            }
+            catch (Exception ex)
+            {
+                MainMenu.ShowMessage($"❌ Error loading profiles: {ex.Message}", ConsoleColor.Red);
+                Console.WriteLine($"\nDetailed error: {ex}");
+                Console.ReadKey();
+            }
+        }
+
+        private void ShowProfiles(List<Profile> profiles)
+        {
+            foreach (var profile in profiles)
+            {
+                try
+                {
+                    Console.Clear();
+                    Console.WriteLine("👤 PROFILE");
+                    Console.WriteLine("------------------");
+                    Console.WriteLine($"Name: {profile.Name} {profile.LastName}");
+                    Console.WriteLine($"Slogan: {profile.Slogan}");
+                    Console.WriteLine($"Total Likes: {profile.TotalLikes}");
+
+                    Console.WriteLine("\nOptions:");
+                    Console.WriteLine("1. Like ❤️");
+                    Console.WriteLine("2. Skip ⏭️");
+                    Console.WriteLine("3. Return to Menu ↩️");
+
+                    string option = MainMenu.ReadText("\nSelect an option: ");
+                    switch (option)
+                    {
+                        case "1":
+                            // TODO: Implement like functionality
+                            MainMenu.ShowMessage("❤️ You liked this profile!", ConsoleColor.Green);
+                            break;
+                        case "2":
+                            continue;
+                        case "3":
+                            return;
+                        default:
+                            MainMenu.ShowMessage("⚠️ Invalid option.", ConsoleColor.Red);
+                            break;
+                    }
+                    Console.ReadKey();
+                }
+                catch (Exception ex)
+                {
+                    MainMenu.ShowMessage($"❌ Error showing profile: {ex.Message}", ConsoleColor.Red);
+                    Console.WriteLine($"\nDetailed error: {ex}");
+                    Console.ReadKey();
+                }
             }
         }
     }
