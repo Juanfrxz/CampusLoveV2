@@ -81,6 +81,8 @@ namespace CampusLove.Application.UI
 
         public static string ReadSecurePassword(string prompt)
         {
+            int startLeft = Console.CursorLeft;
+            int startTop = Console.CursorTop;
             Console.Write(prompt);
             var password = new System.Text.StringBuilder();
             bool showPassword = false;
@@ -90,36 +92,24 @@ namespace CampusLove.Application.UI
             {
                 key = Console.ReadKey(true);
 
+                if (key.Key == ConsoleKey.Tab)
+                {
+                    showPassword = !showPassword;
+                    Console.SetCursorPosition(startLeft, startTop);
+                    Console.Write(prompt);
+                    Console.Write(showPassword ? password.ToString() : new string('*', password.Length));
+                    continue;
+                }
+
                 if (key.Key == ConsoleKey.Backspace && password.Length > 0)
                 {
                     password.Length--;
                     Console.Write("\b \b");
                 }
-                else if (key.Key == ConsoleKey.Tab)
-                {
-                    showPassword = !showPassword;
-                    Console.Write("\r" + new string(' ', Console.WindowWidth - 1) + "\r");
-                    Console.Write(prompt);
-                    if (showPassword)
-                    {
-                        Console.Write(password.ToString());
-                    }
-                    else
-                    {
-                        Console.Write(new string('*', password.Length));
-                    }
-                }
                 else if (!char.IsControl(key.KeyChar))
                 {
                     password.Append(key.KeyChar);
-                    if (showPassword)
-                    {
-                        Console.Write(key.KeyChar);
-                    }
-                    else
-                    {
-                        Console.Write('*');
-                    }
+                    Console.Write(showPassword ? key.KeyChar : '*');
                 }
             } while (key.Key != ConsoleKey.Enter);
 
