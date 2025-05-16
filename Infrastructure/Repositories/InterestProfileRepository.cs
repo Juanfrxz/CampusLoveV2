@@ -38,17 +38,17 @@ namespace CampusLove.Infrastructure.Repositories
 
         public async Task<InterestProfile?> GetByIdAsync(object profile_id)
         {
-            const string query = "SELECT profile_id, interest_id FROM interestProfile WHERE profile_id = @Id";
+            const string query = "SELECT profile_id, interest_id FROM interestProfile WHERE profile_id = @ProfileId";
 
             using var command = new MySqlCommand(query, _connection);
-            command.Parameters.AddWithValue("@Id", profile_id);
+            command.Parameters.AddWithValue("@ProfileId", profile_id);
 
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
                 return new InterestProfile
                 {
-                    Id = Convert.ToInt32(reader["profile_id"]),
+                    ProfileId = Convert.ToInt32(reader["profile_id"]),
                     InterestId = Convert.ToInt32(reader["interest_id"])
                 };
             }
