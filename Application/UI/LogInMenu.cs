@@ -51,9 +51,14 @@ namespace CampusLove.Application.UI
                     {
                         MainMenu.ShowMessage("❌ Fields cannot be empty.", ConsoleColor.Red);
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\nPress any key to try again...");
+                        Console.Write("\nPress any key to continue... (ESC to return to menu)");
                         Console.ResetColor();
-                        Console.ReadKey();
+
+                        var key = Console.ReadKey(true);
+                        if (key.Key == ConsoleKey.Escape)
+                        {
+                            return;
+                        }
                         continue;
                     }
 
@@ -62,9 +67,16 @@ namespace CampusLove.Application.UI
                     {
                         MainMenu.ShowMessage("❌ User not found.", ConsoleColor.Red);
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\nPress any key to try again...");
-                        Console.ResetColor();
-                        Console.ReadKey();
+
+                        Console.Write("\nPress any key to continue... (ESC to return to menu)");
+                            Console.ResetColor();
+
+                        var key = Console.ReadKey(true);
+                        if (key.Key == ConsoleKey.Escape)
+                        {
+                            return;
+                        }
+
                         continue;
                     }
 
@@ -72,9 +84,14 @@ namespace CampusLove.Application.UI
                     {
                         MainMenu.ShowMessage("❌ Incorrect password.", ConsoleColor.Red);
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\nPress any key to try again...");
-                        Console.ResetColor();
-                        Console.ReadKey();
+                        Console.Write("\nPress any key to continue... (ESC to return to menu)");
+                            Console.ResetColor();
+
+                        var key = Console.ReadKey(true);
+                        if (key.Key == ConsoleKey.Escape)
+                        {
+                            return;
+                        }
                         continue;
                     }
 
@@ -84,11 +101,16 @@ namespace CampusLove.Application.UI
                 }
                 catch (Exception ex)
                 {
-                    MainMenu.ShowMessage($"\n❌ Error during login: Check the information", ConsoleColor.Red);
+                    MainMenu.ShowMessage($"\n❌ Error during login: {ex.Message}", ConsoleColor.Red);
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("\nPress any key to try again...");
+                    Console.Write("\nPress any key to continue... (ESC to return to menu)");
                     Console.ResetColor();
-                    Console.ReadKey();
+
+                    var key = Console.ReadKey(true);
+                    if (key.Key == ConsoleKey.Escape)
+                    {
+                        return;
+                    }
                 }
             }
         }
