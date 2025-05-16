@@ -53,7 +53,7 @@ namespace CampusLove.Application.UI
                         await ViewAllProfiles();
                         break;
                     case "2":
-                        //
+                        await FindProfile();
                         break;
                     case "0":
                         returnToMain = true;
@@ -164,6 +164,39 @@ namespace CampusLove.Application.UI
                 Console.ResetColor();
                 Console.ReadKey();
             }
+        }
+
+        private async Task FindProfile()
+        {
+            Console.Clear();
+            Console.WriteLine(" SEARCH PROFILE ");
+
+            string name = MainMenu.ReadText("\nEnter name: ");
+
+            try
+            {
+                var profile = await _profileRepository.GetByNameAsync(name);
+
+                if (profile == null)
+                {
+                    MainMenu.ShowMessage("\nThe profile doesn't exist.", ConsoleColor.Yellow);
+                }
+                else
+                {
+                    Console.WriteLine("PROFILE INFORMATION");
+                    Console.WriteLine($"Name: {profile.Name}");
+                    Console.WriteLine($"Lastname: {profile.LastName}");
+                    Console.WriteLine($"Slogan: {profile.Slogan}");
+                    Console.WriteLine($"Likes: {profile.TotalLikes}");
+                }
+            }
+            catch (Exception ex)
+            {
+                MainMenu.ShowMessage($"\nError searching the profile: {ex.Message}", ConsoleColor.Red);
+            }
+            
+            Console.Write("\nPress any key to continue...");
+            Console.ReadKey();
         }
 
     }
