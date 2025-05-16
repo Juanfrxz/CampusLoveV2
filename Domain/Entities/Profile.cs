@@ -16,5 +16,6 @@ namespace CampusLove.Domain.Entities
         public string FullName => $"{Name} {LastName}";
 
         public User? User { get; set; }
+        public List<InterestProfile> Details { get; set; } = List<InterestProfile>();
     }
 }

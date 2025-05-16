@@ -1,51 +1,40 @@
--- Limpiar tablas existentes
-TRUNCATE TABLE user_match;
-TRUNCATE TABLE userlikes;
-TRUNCATE TABLE interestProfile;
-TRUNCATE TABLE `user`;
-TRUNCATE TABLE profile;
-TRUNCATE TABLE interest;
-TRUNCATE TABLE status;
-TRUNCATE TABLE gender;
-TRUNCATE TABLE profession;
-
 -- Insertar profesiones
 INSERT INTO profession (description) VALUES 
-('Ingeniería de Sistemas'),
-('Medicina'),
-('Psicología'),
-('Derecho'),
-('Arquitectura'),
-('Contabilidad'),
+('Systems Engineering'),
+('Medicine'),
+('Psychology'),
+('Law'),
+('Architecture'),
+('Accounting'),
 ('Marketing'),
-('Enfermería'),
-('Diseño Gráfico'),
-('Administración');
+('Nursing'),
+('Graphic Design'),
+('Administration');
 
 -- Insertar géneros
 INSERT INTO gender (description) VALUES 
-('Masculino'),
-('Femenino'),
-('No binario');
+('Male'),
+('Female'),
+('No binary');
 
 -- Insertar estados
 INSERT INTO status (description) VALUES 
-('Soltero'),
-('Relación abierta'),
-('Casado');
+('Single'),
+('Open Relationship'),
+('Married');
 
 -- Insertar intereses
 INSERT INTO interest (description) VALUES 
-('Música'),
-('Cine'),
-('Viajes'),
-('Deportes'),
-('Literatura'),
-('Fotografía'),
-('Cocina'),
-('Arte'),
-('Tecnología'),
-('Naturaleza');
+('Music'),
+('Films'),
+('Travel'),
+('Sports'),
+('Literature'),
+('Photography'),
+('Cook'),
+('Art'),
+('Technology'),
+('Nature');
 
 -- Insertar perfiles
 INSERT INTO profile (name, lastname, identification, gender_id, slogan, status_id, profession_id, total_likes) VALUES 

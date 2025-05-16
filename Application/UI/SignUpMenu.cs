@@ -148,6 +148,9 @@ namespace CampusLove.Application.UI
                         TotalLikes = 0
                     };
 
+                    //Intereses
+                    
+
                     Console.WriteLine("\nPROFILE INFORMATION");
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine($"Name: {name}");
