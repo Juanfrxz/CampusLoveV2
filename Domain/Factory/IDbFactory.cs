@@ -10,5 +10,4 @@ public interface IDbFactory
     IReactionRepository CreateReactionRepository();
     IDailyLikesRepository CreateDailyLikesRepository();
     IUserMatchRepository CreateUserMatchRepository();
-
 }

@@ -15,6 +15,8 @@ namespace CampusLove.Application.UI
         private readonly UserLikesRepository _userLikesRepository;
         private readonly ProfessionRepository _professionRepository;
         private readonly StatusRepository _statusRepository;
+        private readonly InterestProfileRepository _interestProfileRepository;
+        private readonly InterestRepository _interestRepository;
 
         public ViewProfilesMenu(MySqlConnection connection)
         {
@@ -24,6 +26,8 @@ namespace CampusLove.Application.UI
             _userLikesRepository = new UserLikesRepository(connection);
             _professionRepository = new ProfessionRepository(connection);
             _statusRepository = new StatusRepository(connection);
+            _interestProfileRepository = new InterestProfileRepository(connection);
+            _interestRepository = new InterestRepository(connection);
         }
 
         public async Task ShowMenu(User currentUser)
@@ -78,10 +82,23 @@ namespace CampusLove.Application.UI
                 var genders = (await _genderRepository.GetAllAsync()).ToList();
                 var professions = (await _professionRepository.GetAllAsync()).ToList();
                 var statuses = (await _statusRepository.GetAllAsync()).ToList();
+                var interests = (await _interestRepository.GetAllAsync()).ToList();
 
                 var genderDict = genders.ToDictionary(g => g.Id, g => g.Description);
                 var professionDict = professions.ToDictionary(p => p.Id, p => p.Description);
                 var statusDict = statuses.ToDictionary(s => s.Id, s => s.Description);
+                var interestDict = interests.ToDictionary(i => i.Id, i => i.Description);
+
+                // Load interests for each profile
+                foreach (var profile in profiles)
+                {
+                    var interestProfiles = await _interestProfileRepository.GetAllAsync();
+                    profile.Details = interestProfiles.Where(ip => ip.ProfileId == profile.Id).ToList();
+                    foreach (var detail in profile.Details)
+                    {
+                        detail.Interest = interests.FirstOrDefault(i => i.Id == detail.InterestId);
+                    }
+                }
 
                 if (!profiles.Any())
                 {
@@ -118,6 +135,21 @@ namespace CampusLove.Application.UI
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine($"Total Likes: {profile.TotalLikes}");
                         Console.WriteLine($"Created: {profile.createDate.ToShortDateString()}");
+                        Console.ResetColor();
+
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("\nInterests:");
+                        if (profile.Details.Any())
+                        {
+                            foreach (var detail in profile.Details)
+                            {
+                                Console.WriteLine($"- {detail.Interest?.Description ?? "N/A"}");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("- No interests listed");
+                        }
                         Console.ResetColor();
 
                         Console.WriteLine("-----------------------------");

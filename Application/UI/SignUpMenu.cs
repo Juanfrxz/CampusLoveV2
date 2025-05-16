@@ -16,6 +16,8 @@ namespace CampusLove.Application.UI
         private readonly GenderRepository _genderRepository;
         private readonly ProfessionRepository _professionRepository;
         private readonly StatusRepository _statusRepository;
+        private readonly InterestRepository _interestRepository;
+        private readonly InterestProfileRepository _interestProfileRepository;
 
         public SignUpMenu(MySqlConnection connection)
         {
@@ -24,6 +26,8 @@ namespace CampusLove.Application.UI
             _genderRepository = new GenderRepository(connection);
             _professionRepository = new ProfessionRepository(connection);
             _statusRepository = new StatusRepository(connection);
+            _interestRepository = new InterestRepository(connection);
+            _interestProfileRepository = new InterestProfileRepository(connection);
         }
 
         public async Task RegisterUser()
@@ -148,6 +152,45 @@ namespace CampusLove.Application.UI
                         TotalLikes = 0
                     };
 
+                    Console.WriteLine("\n👤 INTERESTS SELECTION");
+                    Console.WriteLine("------------------");
+
+                    bool addInterestes = true;
+                    while (addInterestes)
+                    {
+                        var interestes = await _interestRepository.GetAllAsync();
+
+                        if (!interestes.Any())
+                        {
+                            MainMenu.ShowMessage("❌ Error: No interestes available in the system.", ConsoleColor.Red);
+                        }
+
+                        Console.WriteLine("\nAvailable interestes:");
+                        foreach (var interest in interestes)
+                        {
+                            Console.WriteLine($"ID:  {interest.Id} -  {interest.Description}");
+                        }
+
+                        int interestId = MainMenu.ReadInteger("\nSelect your interest ID: ");
+
+                        var selectedInterest = interestes.FirstOrDefault(i => i.Id == interestId);
+
+                        if (selectedInterest == null)
+                        {
+                            MainMenu.ShowMessage("❌ Invalid interest ID. Please select an ID from the list.", ConsoleColor.Red);
+                            continue;
+                        }
+
+                        profile.Details.Add(new InterestProfile
+                        {
+                            InterestId = interestId,
+                            Interest = selectedInterest
+                        });
+
+                        string response = MainMenu.ReadText("\nDo you want to add another interest? (Y/N): ");
+                        addInterestes = response.ToUpper() == "Y";
+                    }
+
                     Console.WriteLine("\nPROFILE INFORMATION");
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine($"Name: {name}");
@@ -158,6 +201,13 @@ namespace CampusLove.Application.UI
                     Console.WriteLine($"Profession ID: {professionId}");
                     Console.WriteLine($"Status ID: {statusId}");
 
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\nInterests:");
+                    foreach (var detail in profile.Details)
+                    {
+                        Console.WriteLine($"- {detail.Interest?.Description ?? "N/A"}");
+                    }
+
                     string confirm = MainMenu.ReadText("\nDo you want to register this profile? (Y/N): ");
                     if (confirm.ToUpper() == "Y")
                     {
@@ -165,8 +215,6 @@ namespace CampusLove.Application.UI
 
                         if (result)
                         {
-                            MainMenu.ShowMessage("\n✅ Profile registered successfully.", ConsoleColor.Green);
-                            
                             // Get the newly created profile
                             var lastProfile = await _profileRepository.GetLastProfileAsync();
                             if (lastProfile == null)
@@ -175,6 +223,15 @@ namespace CampusLove.Application.UI
                                 return;
                             }
 
+                            // Save the interests
+                            foreach (var detail in profile.Details)
+                            {
+                                detail.ProfileId = lastProfile.Id;
+                                await _interestProfileRepository.InsertAsync(detail);
+                            }
+
+                            MainMenu.ShowMessage("\n✅ Profile registered successfully.", ConsoleColor.Green);
+                            
                             Console.Clear();
                             Console.WriteLine("👤 USER REGISTRATION");
                             Console.WriteLine("------------------");
