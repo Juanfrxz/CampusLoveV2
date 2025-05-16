@@ -314,14 +314,9 @@ namespace CampusLove.Application.UI
                 }
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\nPress any key to continue... (ESC to return to menu)");
+                Console.Write("\nPress any key to continue...");
                 Console.ResetColor();
-
-                var key = Console.ReadKey(true);
-                if (key.Key == ConsoleKey.Escape)
-                {
-                    return;
-                }
+                Console.ReadKey();
             }
         }
     }

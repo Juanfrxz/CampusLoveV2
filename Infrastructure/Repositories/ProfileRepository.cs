@@ -228,29 +228,46 @@ namespace CampusLove.Infrastructure.Repositories
             return await _connection.QueryFirstOrDefaultAsync<Profile>(sql, new { UserId = userId });
         }
 
-        public async Task<Profile?> GetByNameAsync(string name)
+        public async Task<IEnumerable<Profile>> GetByNameAsync(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name can't be empty", nameof(name));
 
-            const string query = "SELECT name, lastname, slogan, total_likes FROM profile WHERE name = @Name";
+            const string query = @"
+                SELECT p.*, 
+                    g.description as gender_description,
+                    pr.description as profession_description,
+                    s.description as status_description
+                FROM profile p
+                LEFT JOIN gender g ON p.gender_id = g.id
+                LEFT JOIN profession pr ON p.profession_id = pr.id
+                LEFT JOIN status s ON p.status_id = s.id
+                WHERE p.name LIKE @Name OR p.lastname LIKE @Name";
 
+            var profiles = new List<Profile>();
             using var command = new MySqlCommand(query, _connection);
-            command.Parameters.AddWithValue("@Name", name);
+            command.Parameters.AddWithValue("@Name", $"%{name}%");
 
             using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+            while (await reader.ReadAsync())
             {
-                return new Profile
+                var profile = new Profile
                 {
-                    Name = reader["name"].ToString() ?? string.Empty,
-                    LastName = reader["lastname"].ToString() ?? string.Empty,
-                    Slogan = reader["slogan"].ToString() ?? string.Empty,
-                    TotalLikes = Convert.ToInt32(reader["total_likes"])
+                    Id = reader["id"] == DBNull.Value ? 0 : Convert.ToInt32(reader["id"]),
+                    Name = reader["name"]?.ToString() ?? string.Empty,
+                    LastName = reader["lastname"]?.ToString() ?? string.Empty,
+                    Identification = reader["identification"]?.ToString() ?? string.Empty,
+                    Slogan = reader["slogan"]?.ToString() ?? string.Empty,
+                    GenderId = reader["gender_id"] == DBNull.Value ? 0 : Convert.ToInt32(reader["gender_id"]),
+                    ProfessionId = reader["profession_id"] == DBNull.Value ? 0 : Convert.ToInt32(reader["profession_id"]),
+                    StatusId = reader["status_id"] == DBNull.Value ? 0 : Convert.ToInt32(reader["status_id"]),
+                    TotalLikes = reader["total_likes"] == DBNull.Value ? 0 : Convert.ToInt32(reader["total_likes"]),
+                    createDate = reader["createDate"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(reader["createDate"])
                 };
+                profiles.Add(profile);
             }
 
-            return null;
+            return profiles;
         }
     }
 }

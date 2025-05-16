@@ -207,24 +207,76 @@ namespace CampusLove.Application.UI
 
             try
             {
-                var profile = await _profileRepository.GetByNameAsync(name);
+                var profiles = await _profileRepository.GetByNameAsync(name);
+                var genders = (await _genderRepository.GetAllAsync()).ToList();
+                var professions = (await _professionRepository.GetAllAsync()).ToList();
+                var statuses = (await _statusRepository.GetAllAsync()).ToList();
+                var interests = (await _interestRepository.GetAllAsync()).ToList();
 
-                if (profile == null)
+                var genderDict = genders.ToDictionary(g => g.Id, g => g.Description);
+                var professionDict = professions.ToDictionary(p => p.Id, p => p.Description);
+                var statusDict = statuses.ToDictionary(s => s.Id, s => s.Description);
+
+                if (!profiles.Any())
                 {
-                    MainMenu.ShowMessage("\nThe profile doesn't exist.", ConsoleColor.Yellow);
+                    MainMenu.ShowMessage("\nNo profiles found matching the search criteria.", ConsoleColor.Yellow);
                 }
                 else
                 {
-                    Console.WriteLine("PROFILE INFORMATION");
-                    Console.WriteLine($"Name: {profile.Name}");
-                    Console.WriteLine($"Lastname: {profile.LastName}");
-                    Console.WriteLine($"Slogan: {profile.Slogan}");
-                    Console.WriteLine($"Likes: {profile.TotalLikes}");
+                    Console.WriteLine($"\nFound {profiles.Count()} matching profiles:");
+                    Console.WriteLine("------------------");
+
+                    foreach (var profile in profiles)
+                    {
+                        Console.WriteLine("\n-----------------------------");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"Name: {profile.Name} {profile.LastName}");
+                        Console.ResetColor();
+
+                        Console.WriteLine($"Identification: {profile.Identification}");
+                        Console.WriteLine($"Slogan: {profile.Slogan}");
+
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        Console.WriteLine($"Gender: {genderDict.GetValueOrDefault(profile.GenderId, "N/A")}");
+                        Console.WriteLine($"Profession: {professionDict.GetValueOrDefault(profile.ProfessionId, "N/A")}");
+                        Console.WriteLine($"Status: {statusDict.GetValueOrDefault(profile.StatusId, "N/A")}");
+                        Console.ResetColor();
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"Total Likes: {profile.TotalLikes}");
+                        Console.WriteLine($"Created: {profile.createDate.ToShortDateString()}");
+                        Console.ResetColor();
+
+                        // Load and display interests for this profile
+                        var interestProfiles = await _interestProfileRepository.GetAllAsync();
+                        var profileInterests = interestProfiles.Where(ip => ip.ProfileId == profile.Id).ToList();
+                        foreach (var detail in profileInterests)
+                        {
+                            detail.Interest = interests.FirstOrDefault(i => i.Id == detail.InterestId);
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("\nInterests:");
+                        if (profileInterests.Any())
+                        {
+                            foreach (var detail in profileInterests)
+                            {
+                                Console.WriteLine($"- {detail.Interest?.Description ?? "N/A"}");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("- No interests listed");
+                        }
+                        Console.ResetColor();
+
+                        Console.WriteLine("-----------------------------");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MainMenu.ShowMessage($"\nError searching the profile: {ex.Message}", ConsoleColor.Red);
+                MainMenu.ShowMessage($"\nError searching profiles: {ex.Message}", ConsoleColor.Red);
             }
             
             Console.Write("\nPress any key to continue...");
