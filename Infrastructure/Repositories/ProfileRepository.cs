@@ -19,17 +19,34 @@ namespace CampusLove.Infrastructure.Repositories
 
         public async Task<IEnumerable<Profile>> GetAllAsync()
         {
+            if (_connection == null)
+            {
+                throw new InvalidOperationException("Database connection is not initialized");
+            }
+
             var profiles = new List<Profile>();
-            using var command = _connection.CreateCommand();
-            command.CommandText = "SELECT * FROM profile";
+
+            var shouldClose = false;
 
             try
             {
                 if (_connection.State != System.Data.ConnectionState.Open)
                 {
                     await _connection.OpenAsync();
+                    shouldClose = true;
                 }
-                
+
+                using var command = _connection.CreateCommand();
+                command.CommandText = @"
+                    SELECT p.*, 
+                        g.description as gender_description,
+                        pr.description as profession_description,
+                        s.description as status_description
+                    FROM profile p
+                    LEFT JOIN gender g ON p.gender_id = g.id
+                    LEFT JOIN profession pr ON p.profession_id = pr.id
+                    LEFT JOIN status s ON p.status_id = s.id";
+
                 using var reader = await command.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
                 {
@@ -48,17 +65,18 @@ namespace CampusLove.Infrastructure.Repositories
                     };
                     profiles.Add(profile);
                 }
+
+                return profiles;
             }
             finally
             {
-                if (_connection.State == System.Data.ConnectionState.Open)
+                if (shouldClose && _connection.State == System.Data.ConnectionState.Open)
                 {
                     await _connection.CloseAsync();
                 }
             }
-
-            return profiles;
         }
+
 
         public async Task<Profile?> GetByIdAsync(object id)
         {
