@@ -17,6 +17,7 @@ namespace CampusLove.Application.UI
         private readonly ReactionRepository _reactionRepository;
         private readonly UserMatchRepository _usermatchRepository;
         private readonly InteractWithProfilesMenu _interactMenu;
+        private readonly ViewProfilesMenu _viewprofilesMenu;
 
         public LogInMenu(MySqlConnection connection)
         {
@@ -26,6 +27,7 @@ namespace CampusLove.Application.UI
             _usermatchRepository = new UserMatchRepository(connection);
             _settingsMenu = new SettingsMenu(connection);
             _interactMenu = new InteractWithProfilesMenu(connection);
+            _viewprofilesMenu = new ViewProfilesMenu(connection);
         }
 
         public async Task ValidateUser()
@@ -82,7 +84,7 @@ namespace CampusLove.Application.UI
                 }
                 catch (Exception ex)
                 {
-                    MainMenu.ShowMessage($"\n❌ Error during login: {ex.Message}", ConsoleColor.Red);
+                    MainMenu.ShowMessage($"\n❌ Error during login: Check the information", ConsoleColor.Red);
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write("\nPress any key to try again...");
                     Console.ResetColor();
@@ -121,7 +123,7 @@ namespace CampusLove.Application.UI
                     switch (option)
                     {
                         case "1":
-                            //-
+                            _viewprofilesMenu.ShowMenu(currentUser).Wait();
                             break;
                         case "2":
                             _interactMenu.ShowMenu(currentUser).Wait();
