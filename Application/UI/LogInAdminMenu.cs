@@ -157,7 +157,7 @@ namespace CampusLove.Application.UI
                             _statusMenu.ShowMenu();
                             break; 
                         case "5":
-                            //
+                            DeleteProfile().Wait();
                             break; 
                         case "6":
                             //
@@ -178,6 +178,62 @@ namespace CampusLove.Application.UI
                     Console.ReadKey();
                 }
             }
+        }
+
+        public async Task DeleteProfile()
+        {
+            Console.Clear();
+            Console.WriteLine("DELETE PROFILE");
+
+            try
+            {
+                int id = MainMenu.ReadInteger("\nEnter the profile ID to delete: ");
+                var profile = await _profileRepository.GetByIdAsync(id);
+
+                if (profile == null)
+                {
+                    MainMenu.ShowMessage("\n❌ The profile does not exist.", ConsoleColor.Red);
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine($"\nProfile Information:");
+                    Console.WriteLine($"ID: {profile.Id}");
+                    Console.WriteLine($"Name: {profile.Name}");
+                    Console.WriteLine($"Lastname: {profile.LastName}");
+                    Console.WriteLine($"Slogan: {profile.Slogan}");
+                    Console.ResetColor();
+
+                    string confirm = MainMenu.ReadText("\n⚠️ Are you sure you want to delete this profile? (Y/N): ");
+                    
+                    if (confirm.ToUpper() == "Y")
+                    {
+                        bool result = await _profileRepository.DeleteAsync(id);
+                        
+                        if (result)
+                        {
+                            MainMenu.ShowMessage("\n✅ Profile deleted successfully.", ConsoleColor.Green);
+                        }
+                        else
+                        {
+                            MainMenu.ShowMessage("\n❌ Failed to delete the profile.", ConsoleColor.Red);
+                        }
+                    }
+                    else
+                    {
+                        MainMenu.ShowMessage("\n⚠️ Operation cancelled.", ConsoleColor.Yellow);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MainMenu.ShowMessage($"\n❌ Error deleting the profile: {ex.Message}", ConsoleColor.Red);
+            }
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write("\nPress any key to continue...");
+            Console.ResetColor();
+            Console.ReadKey();
         }
     }
 }
