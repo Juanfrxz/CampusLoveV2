@@ -10,4 +10,7 @@ public interface IDbFactory
     IReactionRepository CreateReactionRepository();
     IDailyLikesRepository CreateDailyLikesRepository();
     IUserMatchRepository CreateUserMatchRepository();
+    IAdministratorRepository CreateAdministratorRepository();
+    IInterestRepository CreateInterestRepository();
+    IGenderRepository CreateGenderRepository();
 }

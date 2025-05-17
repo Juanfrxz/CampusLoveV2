@@ -22,6 +22,13 @@ CREATE TABLE IF NOT EXISTS interest (
     description VARCHAR(50)
 );
 
+CREATE TABLE IF NOT EXISTS application (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) UNIQUE,
+    description VARCHAR(100),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+);
+
 CREATE TABLE IF NOT EXISTS profile (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50),
@@ -45,6 +52,24 @@ CREATE TABLE IF NOT EXISTS user (
     profile_id INT,
     birthdate DATE,
     CONSTRAINT profile_id_FK FOREIGN KEY (profile_id) REFERENCES profile(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS application_users(
+    user_id INT,
+    application_id INT,
+    CONSTRAINT user_application_FK FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT application_user_FK FOREIGN KEY (application_id) REFERENCES application(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS administrator (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50),
+    lastname VARCHAR(50),
+    identification VARCHAR(20),
+    username VARCHAR(50),
+    password VARCHAR(50),
+    application_id INT,
+    CONSTRAINT administrator_id_FK FOREIGN KEY (application_id) REFERENCES application(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS userlikes (
