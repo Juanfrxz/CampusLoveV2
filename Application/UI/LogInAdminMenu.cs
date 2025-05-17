@@ -17,6 +17,7 @@ namespace CampusLove.Application.UI
         private readonly StatusMenu _statusMenu;
         private readonly ProfessionMenu _professionMenu;
         private readonly ProfileRepository _profileRepository;
+        private readonly AdministratorMenu _administratorMenu;
 
         public LogInAdminMenu(MySqlConnection connection)
         {
@@ -26,6 +27,7 @@ namespace CampusLove.Application.UI
             _statusMenu = new StatusMenu(connection);
             _professionMenu = new ProfessionMenu(connection);
             _profileRepository = new ProfileRepository(connection);
+            _administratorMenu = new AdministratorMenu(connection);
         }
 
         public async Task ValidateAdmin()
@@ -160,7 +162,7 @@ namespace CampusLove.Application.UI
                             DeleteProfile().Wait();
                             break; 
                         case "6":
-                            //
+                            _administratorMenu.ShowMenu();
                             break;    
                         case "0":
                             returnToMain = true;
