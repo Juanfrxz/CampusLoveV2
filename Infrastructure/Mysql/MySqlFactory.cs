@@ -45,5 +45,21 @@ public class MySqlDbFactory : IDbFactory
         return new UserMatchRepository(connection);
     }
 
+    public IAdministratorRepository CreateAdministratorRepository()
+    {
+        var connection = ConexionSingleton.Instancia(_connectionString).ObtenerConexion();
+        return new AdministratorRepository(connection);
+    }
+
+    public IInterestRepository CreateInterestRepository()
+    {
+        var connection = ConexionSingleton.Instancia(_connectionString).ObtenerConexion();
+        return new InterestRepository(connection);
+    }
     
+    public IGenderRepository CreateGenderRepository()
+    {
+        var connection = ConexionSingleton.Instancia(_connectionString).ObtenerConexion();
+        return new GenderRepository(connection);
+    }
 }

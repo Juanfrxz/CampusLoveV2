@@ -12,6 +12,7 @@ namespace CampusLove.Application.UI
     {
         private readonly SignUpMenu _signupMenu;
         private readonly LogInMenu _loginMenu;
+        private readonly LogInAdminMenu _logInAdminMenu;
 
         public MainMenu()
         {
@@ -21,6 +22,7 @@ namespace CampusLove.Application.UI
             var connection = DatabaseConfig.GetConnection();
             _signupMenu = new SignUpMenu(connection);
             _loginMenu = new LogInMenu(connection);
+            _logInAdminMenu = new LogInAdminMenu(connection);
         }
 
         public void ShowMenu()
@@ -38,6 +40,7 @@ namespace CampusLove.Application.UI
                 Console.WriteLine("  ╠════════════════════════════════════════════╣");
                 Console.WriteLine("  ║     1️⃣  Sign Up                   📰        ║");
                 Console.WriteLine("  ║     2️⃣  Log In                    ☑️         ║");
+                Console.WriteLine("  ║     3️⃣  Administrator             🔑        ║");
                 Console.WriteLine("  ║     0️⃣  Exit                      ❌        ║");
                 Console.WriteLine("  ╚════════════════════════════════════════════╝");
 
@@ -52,6 +55,9 @@ namespace CampusLove.Application.UI
                         break;
                     case "2":
                         _loginMenu.ValidateUser().Wait();
+                        break;
+                    case "3":
+                        _logInAdminMenu.ValidateAdmin().Wait();
                         break;
                     case "0":
                         exit = true;

@@ -1,3 +1,4 @@
+
 -- Insertar profesiones
 INSERT INTO profession (description) VALUES 
 ('Systems Engineering'),
@@ -35,6 +36,10 @@ INSERT INTO interest (description) VALUES
 ('Art'),
 ('Technology'),
 ('Nature');
+
+
+--Insertar aplicación
+INSERT INTO application (name, description) VALUES ('CampusLove', 'Aplicación que permite el emparejamiento de usuarios.');
 
 -- Insertar perfiles
 INSERT INTO profile (name, lastname, identification, gender_id, slogan, status_id, profession_id, total_likes) VALUES 
@@ -119,3 +124,6 @@ INSERT INTO daily_likes (date, profile_id, number_likes, status) VALUES
 (CURDATE(), 10, 7, TRUE),
 (CURDATE(), 11, 2, TRUE),
 (CURDATE(), 12, 5, TRUE);
+
+--Insertar administrador
+INSERT INTO administrator (name, lastname, identification, username, password, application_id) VALUES ('Laura', 'Vargas', '123456789', 'lau22', '123', 1), ('Juan', 'Rodriguez', '987654321', 'Juanxx', '456', 1);
