@@ -7,7 +7,7 @@ using MySql.Data.MySqlClient;
 
 namespace CampusLove.Infrastructure.Repositories
 {
-    public class GenderRepository : IGenericRepository<Gender>
+    public class GenderRepository : IGenericRepository<Gender>, IGenderRepository
     {
         private readonly MySqlConnection _connection;
 
