@@ -165,8 +165,8 @@ namespace CampusLove.Application.UI
                         case "💞  View Matches":
                             await _viewMatchesMenu.ShowMenu(currentUser);
                             break;
-                        case "⚙️  Settings":
-                            _settingsMenu.ShowMenu(currentUser);
+                        case "⚙️   Settings":
+                            await _settingsMenu.ShowMenu(currentUser);
                             break;
                         case "❌  Logout":
                             returnToMain = true;

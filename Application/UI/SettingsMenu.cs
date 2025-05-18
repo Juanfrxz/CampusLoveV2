@@ -23,7 +23,7 @@ namespace CampusLove.Application.UI
             _statusRepository = new StatusRepository(connection);
         }
 
-        public void ShowMenu(User currentUser)
+        public async Task ShowMenu(User currentUser)
         {
             bool returnToMain = false;
 
@@ -51,13 +51,13 @@ namespace CampusLove.Application.UI
                     switch (option)
                     {
                         case "1":
-                            ViewProfile(currentUser).Wait();
+                            await ViewProfile(currentUser);
                             break;
                         case "2":
-                            EditProfile(currentUser).Wait();
+                            await EditProfile(currentUser);
                             break;
                         case "3":
-                            ChangePassword(currentUser).Wait();
+                            await ChangePassword(currentUser);
                             break;
                         case "0":
                             returnToMain = true;
