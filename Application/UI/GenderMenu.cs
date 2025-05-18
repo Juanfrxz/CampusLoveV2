@@ -26,40 +26,50 @@ namespace CampusLove.Application.UI
             while (!returnTo)
             {
                 Console.Clear();
-                MainMenu.ShowTitle(" ⚧️ GENDER   MENU   ");
 
-                Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine("  ╔════════════════════════════════════════════╗");
-                Console.WriteLine("  ║               ⚧️  GENDER MENU               ║");
-                Console.WriteLine("  ╠════════════════════════════════════════════╣");
+                var title = new FigletText("⚧️ GENDER MENU")
+                    .Centered()
+                    .Color(Color.Blue);
 
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("  ║       1️⃣  List Gender              📋       ║");
-                Console.WriteLine("  ║       2️⃣  Create Gender            ➕       ║");
-                Console.WriteLine("  ║       3️⃣  Update Gender            ✏️        ║");
-                Console.WriteLine("  ║       4️⃣  Delete Gender            ✖️        ║");
-                Console.WriteLine("  ║       0️⃣  Return to Admin Menu     ↩️        ║");
-                Console.WriteLine("  ╚════════════════════════════════════════════╝");
+                var panel = new Panel(title)
+                {
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 1, 1, 1),
+                    Header = new PanelHeader(" 💞 CampusLove 💞 ", Justify.Center),
+                };
 
-                Console.ResetColor();
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                string option = MainMenu.ReadText("\n✨ Select an option: ");
+                AnsiConsole.Write(panel);
+                AnsiConsole.WriteLine();
+
+                var menu = new SelectionPrompt<string>()
+                    .Title("[bold blue]Select an option:[/]")
+                    .PageSize(5)
+                    .AddChoices(new[]
+                    {
+                        "📋  List Gender",
+                        "➕  Create Gender",
+                        "✏️   Update Gender",
+                        "✖️   Delete Gender",
+                        "↩️   Return to Admin Menu"
+                    });
+
+                var option = AnsiConsole.Prompt(menu);
 
                 switch (option)
                 {
-                    case "1":
+                    case "📋  List Gender":
                         ListGender().Wait();
                         break;
-                    case "2":
+                    case "➕  Create Gender":
                         CreateGender().Wait();
                         break;
-                    case "3":
+                    case "✏️   Update Gender":
                         UpdateGender().Wait();
                         break;
-                    case "4":
+                    case "✖️   Delete Gender":
                         DeleteGender().Wait();
                         break;
-                    case "0":
+                    case "↩️   Return to Admin Menu":
                         returnTo = true;
                         break;
                     default:
