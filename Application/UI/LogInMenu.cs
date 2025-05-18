@@ -37,9 +37,7 @@ namespace CampusLove.Application.UI
             while (!loginSuccessful)
             {
                 Console.Clear();
-                Console.WriteLine("👥 LOG IN");
-                Console.WriteLine("Welcome to CampusLove");
-                Console.WriteLine("------------------");
+                MainMenu.ShowHeader(" 👥 LOG IN");
                 Console.WriteLine("\nPress TAB to toggle password visibility");
 
                 try
@@ -123,7 +121,7 @@ namespace CampusLove.Application.UI
             while (!returnToMain)
             {
                 Console.Clear();
-                Console.WriteLine($" 🪪 USER MENU - {currentUser.Username}");
+                MainMenu.ShowText($" 👤 USER MENU -  {currentUser.Username}");
 
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("  ╔════════════════════════════════════════════╗");

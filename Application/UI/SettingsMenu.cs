@@ -30,8 +30,7 @@ namespace CampusLove.Application.UI
             while (!returnToMain)
             {
                 Console.Clear();
-                Console.WriteLine($"  ⚙️ SETTINGS MENU {currentUser.Username}");
-                Console.WriteLine("------------------");
+                MainMenu.ShowTitle($"  ⚙️ SETTINGS MENU {currentUser.Username}");
 
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("  ╔════════════════════════════════════════════╗");
@@ -80,8 +79,7 @@ namespace CampusLove.Application.UI
         private async Task ViewProfile(User currentUser)
         {
             Console.Clear();
-            Console.WriteLine("👤 YOUR PROFILE");
-            Console.WriteLine("------------------");
+            MainMenu.ShowText("👤 YOUR PROFILE");
 
             if (currentUser == null)
             {
@@ -100,15 +98,19 @@ namespace CampusLove.Application.UI
             var profession = await _professionRepository.GetByIdAsync(profile.ProfessionId);
             var status = await _statusRepository.GetByIdAsync(profile.StatusId);
 
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"\nName: {profile.Name} {profile.LastName}");
             Console.WriteLine($"Identification: {profile.Identification}");
             Console.WriteLine($"Slogan: {profile.Slogan}");
+
+            Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine($"Gender: {gender?.Description}");
             Console.WriteLine($"Profession: {profession?.Description}");
             Console.WriteLine($"Status: {status?.Description}");
             Console.WriteLine($"Total Likes: {profile.TotalLikes}");
             Console.WriteLine($"Created: {profile.createDate}");
 
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("\nAccount Information:");
             Console.WriteLine($"Username: {currentUser.Username}");
             Console.WriteLine($"Birthdate: {currentUser.Birthdate}");
@@ -120,8 +122,7 @@ namespace CampusLove.Application.UI
         private async Task EditProfile(User currentUser)
         {
             Console.Clear();
-            Console.WriteLine("👤 YOUR PERSONAL INFORMATION");
-            Console.WriteLine("------------------");
+            MainMenu.ShowText("👤 YOUR PERSONAL INFORMATION");
 
             try
             {
@@ -151,8 +152,8 @@ namespace CampusLove.Application.UI
                         profile.Slogan = slogan;
                     }
 
-                    Console.WriteLine("\n👤 STATUS SELECTION");
-                    Console.WriteLine("------------------");
+                    Console.WriteLine("\n💍 STATUS SELECTION");
+                    Console.WriteLine("-------------------------");
 
                     var statuses = await _statusRepository.GetAllAsync();
 
@@ -182,7 +183,7 @@ namespace CampusLove.Application.UI
                     profile.StatusId = selectedStatus.Id;
 
                     Console.Clear();
-                    Console.WriteLine("Profile Update Summary:");
+                    MainMenu.ShowText("Profile Update Summary:");
                     Console.WriteLine($"Name: {profile.Name}");
                     Console.WriteLine($"Lastname: {profile.LastName}");
                     Console.WriteLine($"Slogan: {profile.Slogan}");
@@ -228,7 +229,7 @@ namespace CampusLove.Application.UI
         {
             Console.Clear();
             Console.WriteLine("🔑 CHANGE PASSWORD");
-            Console.WriteLine("------------------");
+            Console.WriteLine("----------------------");
             Console.WriteLine("\nPress TAB to toggle password visibility");
 
             try

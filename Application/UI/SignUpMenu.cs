@@ -37,7 +37,7 @@ namespace CampusLove.Application.UI
             while (!signUpSuccesful)
             {
                 Console.Clear();
-                Console.WriteLine("👥 SIGN UP");
+                MainMenu.ShowHeader("👥 SIGN UP");
 
                 try
                 {
@@ -61,8 +61,7 @@ namespace CampusLove.Application.UI
                         continue;
                     }
 
-                    Console.WriteLine("\n👤 GENDER SELECTION");
-                    Console.WriteLine("------------------");
+                    MainMenu.ShowText("\n♂️  GENDER SELECTION  ♀️");
 
                     var genders = await _genderRepository.GetAllAsync();
 
@@ -89,8 +88,7 @@ namespace CampusLove.Application.UI
                         MainMenu.ShowMessage("❌ Invalid gender ID. Please select an ID from the list.", ConsoleColor.Red);
                     }
 
-                    Console.WriteLine("\n👤 PROFESSION SELECTION");
-                    Console.WriteLine("------------------");
+                    MainMenu.ShowText("\n🤓 PROFESSION SELECTION");
 
                     var professions = await _professionRepository.GetAllAsync();
 
@@ -114,8 +112,7 @@ namespace CampusLove.Application.UI
                         MainMenu.ShowMessage("❌ Invalid profession ID. Please select an ID from the list.", ConsoleColor.Red);
                     }
 
-                    Console.WriteLine("\n👤 STATUS SELECTION");
-                    Console.WriteLine("------------------");
+                    MainMenu.ShowText("\n💍 STATUS SELECTION");
 
                     var statuses = await _statusRepository.GetAllAsync();
 
@@ -152,8 +149,7 @@ namespace CampusLove.Application.UI
                         TotalLikes = 0
                     };
 
-                    Console.WriteLine("\n👤 INTERESTS SELECTION");
-                    Console.WriteLine("------------------");
+                    MainMenu.ShowText("\n🚴 INTERESTS SELECTION");
 
                     bool addInterestes = true;
                     while (addInterestes)
@@ -191,7 +187,7 @@ namespace CampusLove.Application.UI
                         addInterestes = response.ToUpper() == "Y";
                     }
 
-                    Console.WriteLine("\nPROFILE INFORMATION");
+                    MainMenu.ShowText("\nPROFILE INFORMATION");
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine($"Name: {name}");
                     Console.WriteLine($"Lastname: {lastname}");
@@ -233,8 +229,7 @@ namespace CampusLove.Application.UI
                             MainMenu.ShowMessage("\n✅ Profile registered successfully.", ConsoleColor.Green);
                             
                             Console.Clear();
-                            Console.WriteLine("👤 USER REGISTRATION");
-                            Console.WriteLine("------------------");
+                            MainMenu.ShowHeader("👤 USER REGISTRATION");
                             Console.WriteLine("\nPress TAB to toggle password visibility");
 
                             string username = MainMenu.ReadText("\nUsername: ").Trim();
@@ -268,7 +263,7 @@ namespace CampusLove.Application.UI
                                 MainMenu.ShowMessage("❌ Birthdate cannot be in the future.", ConsoleColor.Red);
                             }
 
-                            Console.WriteLine("\nUser Information Summary:");
+                            MainMenu.ShowText("\nUser Information:");
                             Console.WriteLine($"Username: {username}");
                             Console.WriteLine($"Birthdate: {birthDate.ToShortDateString()}");
 

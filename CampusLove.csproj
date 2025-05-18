@@ -9,7 +9,9 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.28" />
+    <PackageReference Include="Figgle" Version="0.5.1" />
     <PackageReference Include="MySql.Data" Version="8.3.0" />
+    <PackageReference Include="Spectre.Console" Version="0.50.1-preview.0.5" />
   </ItemGroup>
 
 </Project>

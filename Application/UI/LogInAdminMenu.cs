@@ -37,9 +37,7 @@ namespace CampusLove.Application.UI
             while (!loginSuccessful)
             {
                 Console.Clear();
-                Console.WriteLine("👥 LOG IN");
-                Console.WriteLine("Welcome to CampusLove");
-                Console.WriteLine("------------------");
+                MainMenu.ShowHeader(" 👥 LOG IN");
                 Console.WriteLine("\nPress TAB to toggle password visibility");
 
                 try
@@ -123,11 +121,11 @@ namespace CampusLove.Application.UI
             while (!returnToMain)
             {
                 Console.Clear();
-                Console.WriteLine($" 🪪 ADMINISTRATOR MENU ");
+                MainMenu.ShowTitle($" 🧑‍💼 ADMINISTRATOR MENU ");
 
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("  ╔════════════════════════════════════════════╗");
-                Console.WriteLine("  ║           👤 ADMINISTRATOR MENU            ║");
+                Console.WriteLine("  ║           🧑‍💼 ADMINISTRATOR MENU            ║");
                 Console.WriteLine("  ╠════════════════════════════════════════════╣");
                 Console.WriteLine("  ║     1️⃣  Interestes                🚴        ║");
                 Console.WriteLine("  ║     2️⃣  Genders                 ♀️ ♂️         ║");
@@ -185,7 +183,7 @@ namespace CampusLove.Application.UI
         public async Task DeleteProfile()
         {
             Console.Clear();
-            Console.WriteLine("DELETE PROFILE");
+            MainMenu.ShowTitle("DELETE PROFILE");
 
             try
             {
@@ -199,7 +197,7 @@ namespace CampusLove.Application.UI
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine($"\nProfile Information:");
+                    MainMenu.ShowText($"\nProfile Information");
                     Console.WriteLine($"ID: {profile.Id}");
                     Console.WriteLine($"Name: {profile.Name}");
                     Console.WriteLine($"Lastname: {profile.LastName}");

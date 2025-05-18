@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CampusLove.Domain.Entities;
 using CampusLove.Infrastructure.Repositories;
 using MySql.Data.MySqlClient;
+using Spectre.Console;
 
 namespace CampusLove.Application.UI
 {
@@ -25,7 +26,7 @@ namespace CampusLove.Application.UI
             while (!returnTo)
             {
                 Console.Clear();
-                Console.WriteLine(" 🚴 INTEREST MENU   ");
+                MainMenu.ShowTitle(" 🚴 INTEREST MENU   ");
 
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("  ╔════════════════════════════════════════════╗");
@@ -74,7 +75,7 @@ namespace CampusLove.Application.UI
         private async Task ListInterest()
         {
             Console.Clear();
-            Console.WriteLine("INTERESTES LIST");
+            MainMenu.ShowText("INTERESTES LIST");
 
             try
             {
@@ -86,25 +87,24 @@ namespace CampusLove.Application.UI
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("\n{0,-5} {1,-12}",
-                        "ID", "Description");
+                    var table = new Table();
 
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine(new string('-', 50));
-                    Console.ResetColor();
+                    table.Border(TableBorder.Rounded);
+                    table.BorderColor(Color.White);
+                    table.Title("[bold magenta]Gender List[/]");
+                    
+                    table.AddColumn(new TableColumn("[bold cyan]ID[/]").Centered());
+                    table.AddColumn(new TableColumn("[bold cyan]Description[/]").LeftAligned());
 
                     foreach (var interest in interestes)
                     {
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.WriteLine("{0,-5} {1,-12}",
-                            interest.Id,
-                            interest.Description);
+                        table.AddRow(
+                            $"[white]{interest.Id}[/]",
+                            $"[white]{interest.Description}[/]"
+                        );
                     }
 
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine(new string('-', 50));
-                    Console.ResetColor();
+                    AnsiConsole.Write(table);
                 }
             }
             catch (Exception ex)
@@ -121,7 +121,7 @@ namespace CampusLove.Application.UI
         private async Task CreateInterest()
         {
             Console.Clear();
-            Console.WriteLine("REGISTER NEW INTEREST");
+            MainMenu.ShowText("REGISTER NEW INTEREST");
 
             try
             {
@@ -138,7 +138,7 @@ namespace CampusLove.Application.UI
                 };
 
                 Console.Clear();
-                Console.WriteLine("INTEREST INFORMATION");
+                MainMenu.ShowText("INTEREST INFORMATION");
 
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine($"Description: {nombre}");
@@ -176,7 +176,7 @@ namespace CampusLove.Application.UI
         private async Task UpdateInterest()
         {
             Console.Clear();
-            Console.WriteLine("UPDATE INTEREST");
+            MainMenu.ShowText("UPDATE INTEREST");
             
             try
             {
@@ -190,7 +190,7 @@ namespace CampusLove.Application.UI
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine($"\nCurrent Information:");
+                    MainMenu.ShowText($"\nCurrent Information:");
                     Console.WriteLine($"Interest ID: {interest.Id}");
                     Console.WriteLine($"Description: {interest.Description}");
                     Console.ResetColor();
@@ -202,7 +202,7 @@ namespace CampusLove.Application.UI
                     }
 
                     Console.Clear();
-                    Console.WriteLine("UPDATED INTEREST INFORMATION");
+                    MainMenu.ShowText("UPDATED INTEREST INFORMATION");
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine($"ID: {interest.Id}");
                     Console.WriteLine($"Description: {interest.Description}");
@@ -242,7 +242,7 @@ namespace CampusLove.Application.UI
         private async Task DeleteInterest()
         {
             Console.Clear();
-            Console.WriteLine("DELETE INTEREST");
+            MainMenu.ShowText("DELETE INTEREST");
             
             try
             {

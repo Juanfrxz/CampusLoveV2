@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CampusLove.Domain.Entities;
 using CampusLove.Infrastructure.Repositories;
 using MySql.Data.MySqlClient;
+using Spectre.Console;
 
 namespace CampusLove.Application.UI
 {
@@ -25,11 +26,11 @@ namespace CampusLove.Application.UI
             while (!returnTo)
             {
                 Console.Clear();
-                Console.WriteLine(" 📱 ADMINISTRATOR   MENU   ");
+                MainMenu.ShowTitle(" 📱 ADMINISTRATOR   MENU   ");
 
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("  ╔════════════════════════════════════════════╗");
-                Console.WriteLine("  ║          📱  ADMINISTRATOR MENU            ║");
+                Console.WriteLine("  ║          📱  ADMINISTRATOR MENU           ║");
                 Console.WriteLine("  ╠════════════════════════════════════════════╣");
 
                 Console.ForegroundColor = ConsoleColor.Cyan;
@@ -74,7 +75,7 @@ namespace CampusLove.Application.UI
         private async Task ListAdministrator()
         {
             Console.Clear();
-            Console.WriteLine("📋 ADMINISTRATOR LIST");
+            MainMenu.ShowText("📋 ADMINISTRATOR LIST");
 
             try
             {
@@ -86,28 +87,30 @@ namespace CampusLove.Application.UI
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("\n{0,-5} {1,-15} {2,-15} {3,-15} {4,-15}",
-                        "ID", "Name", "Last Name", "Identification", "Username");
-
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine(new string('═', 70));
-                    Console.ResetColor();
+                    var table = new Table();
+                    
+                    table.Border(TableBorder.Rounded);
+                    table.BorderColor(Color.White);
+                    table.Title("[bold magenta]Gender List[/]");
+                    
+                    table.AddColumn(new TableColumn("[bold cyan]ID[/]").Centered());
+                    table.AddColumn(new TableColumn("[bold cyan]NAME[/]").LeftAligned());
+                    table.AddColumn(new TableColumn("[bold cyan]LASTNAME[/]").LeftAligned());
+                    table.AddColumn(new TableColumn("[bold cyan]IDENTIFICATION[/]").LeftAligned());
+                    table.AddColumn(new TableColumn("[bold cyan]USERNAME[/]").LeftAligned());
 
                     foreach (var administrator in administrators)
                     {
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.WriteLine("{0,-5} {1,-15} {2,-15} {3,-15} {4,-15}",
-                            administrator.Id,
-                            administrator.Name,
-                            administrator.LastName,
-                            administrator.Identification,
-                            administrator.Username);
+                        table.AddRow(
+                            $"[white]{administrator.Id}[/]",
+                            $"[white]{administrator.Name}[/]",
+                            $"[white]{administrator.LastName}[/]",
+                            $"[white]{administrator.Identification}[/]",
+                            $"[white]{administrator.Username}[/]"
+                        );
                     }
 
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine(new string('═', 70));
-                    Console.ResetColor();
+                    AnsiConsole.Write(table);
                 }
             }
             catch (Exception ex)
@@ -124,7 +127,7 @@ namespace CampusLove.Application.UI
         private async Task CreateAdministrator()
         {
             Console.Clear();
-            Console.WriteLine("REGISTER NEW ADMINISTRATOR");
+            MainMenu.ShowText("REGISTER NEW ADMINISTRATOR");
 
             try
             {
@@ -174,7 +177,7 @@ namespace CampusLove.Application.UI
                 };
 
                 Console.Clear();
-                Console.WriteLine("ADMNISTRATOR INFORMATION");
+                MainMenu.ShowText("ADMNISTRATOR INFORMATION");
 
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine($"Name: {nombre}");
@@ -215,7 +218,7 @@ namespace CampusLove.Application.UI
         private async Task UpdateAdministrator()
         {
             Console.Clear();
-            Console.WriteLine("UPDATE ADMINISTRATOR");
+            MainMenu.ShowText("UPDATE ADMINISTRATOR");
             
             try
             {
@@ -229,7 +232,7 @@ namespace CampusLove.Application.UI
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine($"\nCurrent Information:");
+                    MainMenu.ShowText($"\nCurrent Information:");
                     Console.WriteLine($"Name: {administrator.Name}");
                     Console.WriteLine($"Lastname: {administrator.LastName}");
                     Console.WriteLine($"Identification: {administrator.Identification}");
@@ -310,7 +313,7 @@ namespace CampusLove.Application.UI
         private async Task DeleteAdministrator()
         {
             Console.Clear();
-            Console.WriteLine("DELETE ADMINISTRATOR");
+            MainMenu.ShowText("DELETE ADMINISTRATOR");
 
             try
             {
