@@ -21,55 +21,67 @@ namespace CampusLove.Application.UI
         public void ShowMenu()
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            bool returnTo = false; 
+            bool returnTo = false;
 
             while (!returnTo)
             {
                 Console.Clear();
-                MainMenu.ShowTitle(" 📱 ADMINISTRATOR   MENU   ");
 
-                Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine("  ╔════════════════════════════════════════════╗");
-                Console.WriteLine("  ║          📱  ADMINISTRATOR MENU           ║");
-                Console.WriteLine("  ╠════════════════════════════════════════════╣");
+                // Título con Figlet y Panel, igual que MainMenu
+                var title = new FigletText("📱 ADMINISTRATOR MENU")
+                    .Centered()
+                    .Color(Color.Blue);
 
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("  ║       1️⃣  List Administrator       📋       ║");
-                Console.WriteLine("  ║       2️⃣  Create Administrator     ➕       ║");
-                Console.WriteLine("  ║       3️⃣  Update Administrator     ✏️        ║");
-                Console.WriteLine("  ║       4️⃣  Delete Administrator     ✖️        ║");
-                Console.WriteLine("  ║       0️⃣  Return to Admin Menu     ↩️        ║");
-                Console.WriteLine("  ╚════════════════════════════════════════════╝");
+                var panel = new Panel(title)
+                {
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 1, 1, 1),
+                    Header = new PanelHeader(" 💞 CampusLove 💞 ", Justify.Center),
+                };
 
-                Console.ResetColor();
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                string option = MainMenu.ReadText("\n✨ Select an option: ");
+                AnsiConsole.Write(panel);
+                AnsiConsole.WriteLine();
+
+                // Menú interactivo con SelectionPrompt
+                var menu = new SelectionPrompt<string>()
+                    .Title("[bold blue]Selecciona una opción:[/]")
+                    .PageSize(6)
+                    .AddChoices(new[]
+                    {
+                        "📋  Listar Administradores",
+                        "➕  Crear Administrador",
+                        "✏️   Actualizar Administrador",
+                        "✖️   Eliminar Administrador",
+                        "↩️   Volver al menú anterior"
+                    });
+
+                var option = AnsiConsole.Prompt(menu);
 
                 switch (option)
                 {
-                    case "1":
+                    case "📋  Listar Administradores":
                         ListAdministrator().Wait();
                         break;
-                    case "2":
+                    case "➕  Crear Administrador":
                         CreateAdministrator().Wait();
                         break;
-                    case "3":
+                    case "✏️   Actualizar Administrador":
                         UpdateAdministrator().Wait();
                         break;
-                    case "4":
+                    case "✖️   Eliminar Administrador":
                         DeleteAdministrator().Wait();
                         break;
-                    case "0":
+                    case "↩️   Volver al menú anterior":
                         returnTo = true;
                         break;
                     default:
-                        MainMenu.ShowMessage("⚠️ Invalid option. Please try again.", ConsoleColor.Red);
+                        MainMenu.ShowMessage("⚠️ Opción inválida. Intenta de nuevo.", ConsoleColor.Red);
                         Console.ReadKey();
                         break;
                 }
             }
 
-            MainMenu.ShowMessage("\n👋 Thank you for using the application! Have a great day! 🌟", ConsoleColor.Green);
+            MainMenu.ShowMessage("\n👋 ¡Gracias por usar la aplicación! ¡Que tengas un gran día! 🌟", ConsoleColor.Green);
         }
 
         private async Task ListAdministrator()
