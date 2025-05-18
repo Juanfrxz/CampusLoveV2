@@ -6,6 +6,7 @@ using CampusLove.Domain.Entities;
 using CampusLove.Infrastructure.Repositories;
 using CampusLove.Infrastructure.Configuration;
 using MySql.Data.MySqlClient;
+using Spectre.Console;
 
 namespace CampusLove.Application.UI
 {
@@ -117,59 +118,73 @@ namespace CampusLove.Application.UI
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             bool returnToMain = false;
-
+    
             while (!returnToMain)
             {
                 Console.Clear();
-                MainMenu.ShowTitle($" 🧑‍💼 ADMINISTRATOR MENU ");
-
-                Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Console.WriteLine("  ╔════════════════════════════════════════════╗");
-                Console.WriteLine("  ║           🧑‍💼 ADMINISTRATOR MENU            ║");
-                Console.WriteLine("  ╠════════════════════════════════════════════╣");
-                Console.WriteLine("  ║     1️⃣  Interestes                🚴        ║");
-                Console.WriteLine("  ║     2️⃣  Genders                 ♀️ ♂️         ║");
-                Console.WriteLine("  ║     3️⃣  Profession                🤓        ║");
-                Console.WriteLine("  ║     4️⃣  Status                    👩‍❤️‍👩     ║");
-                Console.WriteLine("  ║     5️⃣  Delete User               ❎        ║");
-                Console.WriteLine("  ║     6️⃣  Administrator             📱        ║");
-                Console.WriteLine("  ║     0️⃣  Logout                    ❌        ║");
-                Console.WriteLine("  ╚════════════════════════════════════════════╝");
-
-                Console.ResetColor();
-                Console.ForegroundColor = ConsoleColor.Gray;
-                string option = MainMenu.ReadText("\n✨ Select an option: ");
-
+    
+                // Título con Figlet y Panel, igual que los otros menús modernos
+                var title = new FigletText("🧑‍💼 ADMIN MENU")
+                    .Centered()
+                    .Color(Color.Blue);
+    
+                var panel = new Panel(title)
+                {
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 1, 1, 1),
+                    Header = new PanelHeader(" 💞 CampusLove 💞 ", Justify.Center),
+                };
+    
+                AnsiConsole.Write(panel);
+                AnsiConsole.WriteLine();
+    
+                // Menú interactivo con SelectionPrompt
+                var menu = new SelectionPrompt<string>()
+                    .Title("[bold blue]Selecciona una opción:[/]")
+                    .PageSize(7)
+                    .AddChoices(new[]
+                    {
+                        "🚴  Intereses",
+                        "♀️ ♂️  Géneros",
+                        "🤓  Profesión",
+                        "👩‍❤️‍👩  Estado",
+                        "❎  Eliminar Usuario",
+                        "📱  Administrador",
+                        "❌  Cerrar sesión"
+                    });
+    
+                var option = AnsiConsole.Prompt(menu);
+    
                 try
                 {
                     switch (option)
                     {
-                        case "1":
+                        case "🚴  Intereses":
                             _interestMenu.ShowMenu();
                             break;
-                        case "2":
+                        case "♀️ ♂️  Géneros":
                             _genderMenu.ShowMenu();
                             break;
-                        case "3":
+                        case "🤓  Profesión":
                             _professionMenu.ShowMenu();
                             break;
-                        case "4":
+                        case "👩‍❤️‍👩  Estado":
                             _statusMenu.ShowMenu();
-                            break; 
-                        case "5":
+                            break;
+                        case "❎  Eliminar Usuario":
                             DeleteProfile().Wait();
-                            break; 
-                        case "6":
+                            break;
+                        case "📱  Administrador":
                             _administratorMenu.ShowMenu();
-                            break;    
-                        case "0":
+                            break;
+                        case "❌  Cerrar sesión":
                             returnToMain = true;
-                            MainMenu.ShowMessage("\n👋 Logging out...", ConsoleColor.Blue);
+                            MainMenu.ShowMessage("\n👋 Cerrando sesión...", ConsoleColor.Blue);
                             break;
                         default:
-                            MainMenu.ShowMessage("⚠️ Invalid option. Please try again.", ConsoleColor.Red);
+                            MainMenu.ShowMessage("⚠️ Opción inválida. Intenta de nuevo.", ConsoleColor.Red);
                             Console.ReadKey();
-                            break;  
+                            break;
                     }
                 }
                 catch (Exception ex)
