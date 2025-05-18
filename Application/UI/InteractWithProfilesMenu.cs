@@ -4,6 +4,7 @@ using System.Linq;
 using CampusLove.Domain.Entities;
 using CampusLove.Infrastructure.Repositories;
 using MySql.Data.MySqlClient;
+using Spectre.Console;
 
 namespace CampusLove.Application.UI
 {
@@ -30,36 +31,50 @@ namespace CampusLove.Application.UI
             while (!returnToMain)
             {
                 Console.Clear();
-                MainMenu.ShowTitle("💘  INTERACT WITH PROFILES");
 
-                Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Console.WriteLine("  ╔════════════════════════════════════════════╗");
-                Console.WriteLine("  ║           💘 INTERACT WITH PROFILES        ║");
-                Console.WriteLine("  ╠════════════════════════════════════════════╣");
-                Console.WriteLine("  ║     1️⃣  Browse Profiles           👥        ║");
-                Console.WriteLine("  ║     2️⃣  Change Gender Preference  ♀️ ♂️       ║");
-                Console.WriteLine("  ║     0️⃣  Return to Menu           ↩️          ║");
-                Console.WriteLine("  ╚════════════════════════════════════════════╝");
+                // Título con Figlet y Panel
+                var title = new FigletText("💘 INTERACT")
+                    .Centered()
+                    .Color(Color.Blue);
 
-                Console.ResetColor();
-                Console.ForegroundColor = ConsoleColor.Gray;
-                string option = MainMenu.ReadText("\n✨ Select an option: ");
+                var panel = new Panel(title)
+                {
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 1, 1, 1),
+                    Header = new PanelHeader(" 💞 CampusLove 💞 ", Justify.Center),
+                };
+
+                AnsiConsole.Write(panel);
+                AnsiConsole.WriteLine();
+
+                // Menú interactivo con SelectionPrompt
+                var menu = new SelectionPrompt<string>()
+                    .Title("[bold blue]Select an option:[/]")
+                    .PageSize(4)
+                    .AddChoices(new[]
+                    {
+                        "👥  Browse Profiles",
+                        "♀️ ♂️  Change Gender Preference",
+                        "↩️  Return to Menu"
+                    });
+
+                var option = AnsiConsole.Prompt(menu);
 
                 try
                 {
                     switch (option)
                     {
-                        case "1":
+                        case "👥  Browse Profiles":
                             if (_preferredGenderId == null)
                             {
                                 await SelectGenderPreference();
                             }
                             await BrowseProfiles(currentUser);
                             break;
-                        case "2":
+                        case "♀️ ♂️  Change Gender Preference":
                             await SelectGenderPreference();
                             break;
-                        case "0":
+                        case "↩️  Return to Menu":
                             returnToMain = true;
                             break;
                         default:
@@ -164,7 +179,7 @@ namespace CampusLove.Application.UI
             }
         }
 
-        private async Task ShowProfiles(List<Profile> profiles, User currentUser)
+        private async Task ShowProfiles(System.Collections.Generic.List<CampusLove.Domain.Entities.Profile> profiles, User currentUser)
         {
             foreach (var profile in profiles)
             {
@@ -225,7 +240,7 @@ namespace CampusLove.Application.UI
             }
         }
 
-        private async Task HandleLike(User currentUser, Profile likedProfile)
+        private async Task HandleLike(User currentUser, CampusLove.Domain.Entities.Profile likedProfile)
         {
             try
             {
@@ -281,4 +296,4 @@ namespace CampusLove.Application.UI
             return await _userLikesRepository.HasUserLikedProfileAsync(likedProfileId, userProfile.Id);
         }
     }
-} 
+}
