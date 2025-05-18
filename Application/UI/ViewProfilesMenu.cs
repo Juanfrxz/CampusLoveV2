@@ -37,36 +37,57 @@ namespace CampusLove.Application.UI
             while (!returnToMain)
             {
                 Console.Clear();
-                MainMenu.ShowTitle(" 🫂 VIEW PROFILES ");
+                var title = new FigletText("🫂 VIEW PROFILES")
+                    .Centered()
+                    .Color(Color.Blue);
 
-                Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Console.WriteLine("  ╔════════════════════════════════════════════╗");
-                Console.WriteLine("  ║               🫂  VIEW PROFILES             ║");
-                Console.WriteLine("  ╠════════════════════════════════════════════╣");
-                Console.WriteLine("  ║     1️⃣  View Profiles             👥        ║");
-                Console.WriteLine("  ║     2️⃣  Find people               🕵️‍♂️        ║");
-                Console.WriteLine("  ║     0️⃣  Return to Menu           ↩️          ║");
-                Console.WriteLine("  ╚════════════════════════════════════════════╝");
-
-                Console.ResetColor();
-                Console.ForegroundColor = ConsoleColor.Gray;
-                string option = MainMenu.ReadText("\n✨ Select an option: ");
-
-                switch (option)
+                var panel = new Panel(title)
                 {
-                    case "1":
-                        await ViewAllProfiles();
-                        break;
-                    case "2":
-                        await FindProfile();
-                        break;
-                    case "0":
-                        returnToMain = true;
-                        break;
-                    default:
-                        MainMenu.ShowMessage("⚠️ Invalid option. Please try again.", ConsoleColor.Red);
-                        Console.ReadKey();
-                        break;
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 1, 1, 1),
+                    Header = new PanelHeader(" 💞 CampusLove 💞 ", Justify.Center),
+                };
+
+                AnsiConsole.Write(panel);
+                AnsiConsole.WriteLine();
+
+                var menu = new SelectionPrompt<string>()
+                    .Title("[bold blue]Select an option:[/]")
+                    .PageSize(5)
+                    .AddChoices(new[]
+                    {
+                        "🔍 Find Profile",
+                        "📋 List Profiles",
+                        "↩️ Return to Main Menu"
+                    });
+
+                var option = AnsiConsole.Prompt(menu);
+
+                try
+                {
+                    switch (option)
+                    {
+                        case "🔍 Find Profile":
+                            await FindProfile();
+                            break;
+                        case "📋 List Profiles":
+                            await ViewAllProfiles();
+                            break;
+                        case "↩️ Return to Main Menu":
+                            returnToMain = true;
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var errorPanel = new Panel($"[red]❌ Error: {ex.Message}[/]")
+                    {
+                        Border = BoxBorder.Rounded,
+                        BorderStyle = new Style(Color.Red),
+                        Padding = new Padding(1, 1, 1, 1)
+                    };
+                    AnsiConsole.Write(errorPanel);
+                    Console.ReadKey();
                 }
             }
         }

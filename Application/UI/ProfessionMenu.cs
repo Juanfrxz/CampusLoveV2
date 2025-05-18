@@ -26,40 +26,50 @@ namespace CampusLove.Application.UI
             while (!returnTo)
             {
                 Console.Clear();
-                MainMenu.ShowTitle(" 🤓 PROFESSION MENU   ");
 
-                Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine("  ╔════════════════════════════════════════════╗");
-                Console.WriteLine("  ║            🤓  PROFESSION MENU             ║");
-                Console.WriteLine("  ╠════════════════════════════════════════════╣");
+                var title = new FigletText("🤓 PROFESSION MENU")
+                    .Centered()
+                    .Color(Color.Blue);
 
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("  ║       1️⃣  List Profession              📋   ║");
-                Console.WriteLine("  ║       2️⃣  Create Profession            ➕   ║");
-                Console.WriteLine("  ║       3️⃣  Update Profession            ✏️    ║");
-                Console.WriteLine("  ║       4️⃣  Delete Profession            ✖️    ║");
-                Console.WriteLine("  ║       0️⃣  Return to Admin Menu     ↩️        ║");
-                Console.WriteLine("  ╚════════════════════════════════════════════╝");
+                var panel = new Panel(title)
+                {
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 1, 1, 1),
+                    Header = new PanelHeader(" 💞 CampusLove 💞 ", Justify.Center),
+                };
 
-                Console.ResetColor();
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                string option = MainMenu.ReadText("\n✨ Select an option: ");
+                AnsiConsole.Write(panel);
+                AnsiConsole.WriteLine();
+
+                var menu = new SelectionPrompt<string>()
+                    .Title("[bold blue]Select an option:[/]")
+                    .PageSize(5)
+                    .AddChoices(new[]
+                    {
+                        "📋  List Profession",
+                        "➕  Create Profession",
+                        "✏️   Update Profession",
+                        "✖️   Delete Profession",
+                        "↩️   Return to Admin Menu"
+                    });
+
+                var option = AnsiConsole.Prompt(menu);
 
                 switch (option)
                 {
-                    case "1":
+                    case "📋  List Profession":
                         ListProfession().Wait();
                         break;
-                    case "2":
+                    case "➕  Create Profession":
                         CreateProfession().Wait();
                         break;
-                    case "3":
+                    case "✏️   Update Profession":
                         UpdateProfession().Wait();
                         break;
-                    case "4":
+                    case "✖️   Delete Profession":
                         DeleteProfession().Wait();
                         break;
-                    case "0":
+                    case "↩️   Return to Admin Menu":
                         returnTo = true;
                         break;
                     default:
