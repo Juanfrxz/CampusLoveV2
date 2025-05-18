@@ -1,4 +1,6 @@
-﻿using CampusLove.Application.UI;
+﻿using System;
+using System.Threading.Tasks;
+using CampusLove.Application.UI;
 using CampusLove.Infrastructure.Configuration;
 using CampusLove.Infrastructure.Repositories;
 using MySql.Data.MySqlClient;
@@ -7,7 +9,7 @@ namespace CampusLove
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
@@ -16,7 +18,7 @@ namespace CampusLove
                 var connection = DatabaseConfig.GetConnection();
 
                 var mainMenu = new MainMenu();
-                mainMenu.ShowMenu();
+                await mainMenu.ShowMenu();
             }
             catch (Exception ex)
             {
