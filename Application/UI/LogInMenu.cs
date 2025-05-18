@@ -6,6 +6,7 @@ using CampusLove.Domain.Entities;
 using CampusLove.Infrastructure.Repositories;
 using CampusLove.Infrastructure.Configuration;
 using MySql.Data.MySqlClient;
+using Spectre.Console;
 
 namespace CampusLove.Application.UI
 {
@@ -46,7 +47,7 @@ namespace CampusLove.Application.UI
                 {
                     string username = MainMenu.ReadText("\nUsername: ").Trim();
                     string password = MainMenu.ReadSecurePassword("Password: ").Trim();
-                    
+
                     if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
                     {
                         MainMenu.ShowMessage("❌ Fields cannot be empty.", ConsoleColor.Red);
@@ -69,7 +70,7 @@ namespace CampusLove.Application.UI
                         Console.ForegroundColor = ConsoleColor.Yellow;
 
                         Console.Write("\nPress any key to continue... (ESC to return to menu)");
-                            Console.ResetColor();
+                        Console.ResetColor();
 
                         var key = Console.ReadKey(true);
                         if (key.Key == ConsoleKey.Escape)
@@ -85,7 +86,7 @@ namespace CampusLove.Application.UI
                         MainMenu.ShowMessage("❌ Incorrect password.", ConsoleColor.Red);
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write("\nPress any key to continue... (ESC to return to menu)");
-                            Console.ResetColor();
+                        Console.ResetColor();
 
                         var key = Console.ReadKey(true);
                         if (key.Key == ConsoleKey.Escape)
@@ -123,55 +124,76 @@ namespace CampusLove.Application.UI
             while (!returnToMain)
             {
                 Console.Clear();
-                MainMenu.ShowText($" 👤 USER MENU -  {currentUser.Username}");
+                var title = new FigletText($"👤 USER MENU ")
+                    .Centered()
+                    .Color(Color.Blue);
 
-                Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Console.WriteLine("  ╔════════════════════════════════════════════╗");
-                Console.WriteLine("  ║                👤 USER MENU                ║");
-                Console.WriteLine("  ╠════════════════════════════════════════════╣");
-                Console.WriteLine("  ║     1️⃣  View Profiles             👥        ║");
-                Console.WriteLine("  ║     2️⃣  Interact with Profiles    😍        ║");
-                Console.WriteLine("  ║     3️⃣  View Matches              💞        ║");
-                Console.WriteLine("  ║     4️⃣  Settings                   ⚙️        ║");
-                Console.WriteLine("  ║     0️⃣  Logout                    ❌        ║");
-                Console.WriteLine("  ╚════════════════════════════════════════════╝");
+                var panel = new Panel(title)
+                {
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 1, 1, 1),
+                    Header = new PanelHeader(" 💞 CampusLove 💞 ", Justify.Center),
+                };
 
-                Console.ResetColor();
-                Console.ForegroundColor = ConsoleColor.Gray;
-                string option = MainMenu.ReadText("\n✨ Select an option: ");
+                AnsiConsole.Write(panel);
+                AnsiConsole.WriteLine();
+
+                var menu = new SelectionPrompt<string>()
+                    .Title("[bold blue]Select an option:[/]")
+                    .PageSize(5)
+                    .AddChoices(new[]
+                    {
+                "👥  View Profiles",
+                "😍  Interact with Profiles",
+                "💞  View Matches",
+                "⚙️  Settings",
+                "❌  Logout"
+                    });
+
+                var option = AnsiConsole.Prompt(menu);
 
                 try
                 {
                     switch (option)
                     {
-                        case "1":
-                            _viewprofilesMenu.ShowMenu(currentUser).Wait();
+                        case "👥  View Profiles":
+                            await _viewprofilesMenu.ShowMenu(currentUser);
                             break;
-                        case "2":
-                            _interactMenu.ShowMenu(currentUser).Wait();
+                        case "😍  Interact with Profiles":
+                            await _interactMenu.ShowMenu(currentUser);
                             break;
-                        case "3":
+                        case "💞  View Matches":
                             await _viewMatchesMenu.ShowMenu(currentUser);
                             break;
-                        case "4":
+                        case "⚙️  Settings":
                             _settingsMenu.ShowMenu(currentUser);
-                            break;    
-                        case "0":
-                            returnToMain = true;
-                            MainMenu.ShowMessage("\n👋 Logging out...", ConsoleColor.Blue);
                             break;
-                        default:
-                            MainMenu.ShowMessage("⚠️ Invalid option. Please try again.", ConsoleColor.Red);
-                            Console.ReadKey();
-                            break;  
+                        case "❌  Logout":
+                            returnToMain = true;
+                            var logoutPanel = new Panel("[blue]👋 Logging out...[/]")
+                            {
+                                Border = BoxBorder.Rounded,
+                                BorderStyle = new Style(Color.Blue),
+                                Padding = new Padding(1, 1, 1, 1)
+                            };
+                            AnsiConsole.Write(logoutPanel);
+                            await Task.Delay(1000);
+                            break;
                     }
                 }
                 catch (Exception ex)
                 {
-                    MainMenu.ShowMessage($"\n❌ Error: {ex.Message}", ConsoleColor.Red);
+                    var errorPanel = new Panel($"[red]❌ Error: {ex.Message}[/]")
+                    {
+                        Border = BoxBorder.Rounded,
+                        BorderStyle = new Style(Color.Red),
+                        Padding = new Padding(1, 1, 1, 1)
+                    };
+                    AnsiConsole.Write(errorPanel);
                     Console.ReadKey();
                 }
             }
         }
+
     }
 }
