@@ -137,10 +137,10 @@ namespace CampusLove.Application.UI
 
             try
             {
-                string nombre = MainMenu.ReadText("\nDescription gender: ").Trim();
+                string nombre = MainMenu.ReadText("\nGender description: ").Trim();
                 if (string.IsNullOrEmpty(nombre))
                 {
-                    MainMenu.ShowMessage("Description gender cannot be empty.", ConsoleColor.Red);
+                    MainMenu.ShowMessage("Gender description cannot be empty.", ConsoleColor.Red);
                     return;
                 }
 
@@ -207,7 +207,7 @@ namespace CampusLove.Application.UI
                     Console.WriteLine($"Description: {gender.Description}");
                     Console.ResetColor();
                     
-                    string nombre = MainMenu.ReadText($"Enter new gender ({gender.Description}): ");
+                    string nombre = MainMenu.ReadText($"Enter new gender description ({gender.Description}): ");
                     if (!string.IsNullOrWhiteSpace(nombre))
                     {
                         gender.Description = nombre;
