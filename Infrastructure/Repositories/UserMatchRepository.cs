@@ -18,7 +18,7 @@ namespace CampusLove.Infrastructure.Repositories
         public async Task<IEnumerable<UserMatch>> GetAllAsync()
         {
             var userMatches = new List<UserMatch>();
-            const string query = "SELECT id, user1_id, user2_id, matchDate FROM user_match";
+            const string query = "SELECT id, user1_id, user2_id, match_date FROM user_match";
 
             using var command = new MySqlCommand(query, _connection);
             using var reader = await command.ExecuteReaderAsync();
@@ -30,7 +30,7 @@ namespace CampusLove.Infrastructure.Repositories
                     Id = Convert.ToInt32(reader["id"]),
                     User1_id = Convert.ToInt32(reader["user1_id"]),
                     User2_id = Convert.ToInt32(reader["user2_id"]),
-                    MatchDate = Convert.ToDateTime(reader["matchDate"])
+                    MatchDate = Convert.ToDateTime(reader["match_date"])
                 });
             }
 
@@ -39,7 +39,7 @@ namespace CampusLove.Infrastructure.Repositories
 
         public async Task<UserMatch?> GetByIdAsync(object id)
         {
-            const string query = "SELECT id, user1_id, user2_id, matchDate FROM user_match WHERE id = @Id";
+            const string query = "SELECT id, user1_id, user2_id, match_date FROM user_match WHERE id = @Id";
 
             using var command = new MySqlCommand(query, _connection);
             command.Parameters.AddWithValue("@Id", id);
@@ -52,7 +52,7 @@ namespace CampusLove.Infrastructure.Repositories
                     Id = Convert.ToInt32(reader["id"]),
                     User1_id = Convert.ToInt32(reader["user1_id"]),
                     User2_id = Convert.ToInt32(reader["user2_id"]),
-                    MatchDate = Convert.ToDateTime(reader["matchDate"])
+                    MatchDate = Convert.ToDateTime(reader["match_date"])
                 };
             }
 
@@ -64,7 +64,7 @@ namespace CampusLove.Infrastructure.Repositories
             if (userMatch == null)
                 throw new ArgumentNullException(nameof(userMatch));
 
-            const string query = "INSERT INTO user_match (user1_id, user2_id, matchDate) VALUES (@User1_id, @User2_id, @MatchDate)";
+            const string query = "INSERT INTO user_match (user1_id, user2_id, match_date) VALUES (@User1_id, @User2_id, @MatchDate)";
             using var transaction = await _connection.BeginTransactionAsync();
 
             try
@@ -90,7 +90,7 @@ namespace CampusLove.Infrastructure.Repositories
             if (userMatch == null)
                 throw new ArgumentNullException(nameof(userMatch));
 
-            const string query = "UPDATE user_match SET user1_id = @User1_id, user2_id = @User2_id, matchDate = @MatchDate WHERE id = @Id";
+            const string query = "UPDATE user_match SET user1_id = @User1_id, user2_id = @User2_id, match_date = @MatchDate WHERE id = @Id";
             using var transaction = await _connection.BeginTransactionAsync();
 
              try

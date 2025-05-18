@@ -18,6 +18,7 @@ namespace CampusLove.Application.UI
         private readonly UserMatchRepository _usermatchRepository;
         private readonly InteractWithProfilesMenu _interactMenu;
         private readonly ViewProfilesMenu _viewprofilesMenu;
+        private readonly ViewMatchesMenu _viewMatchesMenu;
 
         public LogInMenu(MySqlConnection connection)
         {
@@ -28,6 +29,7 @@ namespace CampusLove.Application.UI
             _settingsMenu = new SettingsMenu(connection);
             _interactMenu = new InteractWithProfilesMenu(connection);
             _viewprofilesMenu = new ViewProfilesMenu(connection);
+            _viewMatchesMenu = new ViewMatchesMenu(connection);
         }
 
         public async Task ValidateUser()
@@ -95,7 +97,7 @@ namespace CampusLove.Application.UI
 
                     MainMenu.ShowMessage($"\n✅ Welcome {user.Username}!", ConsoleColor.Green);
                     loginSuccessful = true;
-                    ShowMenu(user);
+                    await ShowUserMenu(user);
                 }
                 catch (Exception ex)
                 {
@@ -113,7 +115,7 @@ namespace CampusLove.Application.UI
             }
         }
 
-        public void ShowMenu(User currentUser)
+        public async Task ShowUserMenu(User currentUser)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             bool returnToMain = false;
@@ -149,7 +151,7 @@ namespace CampusLove.Application.UI
                             _interactMenu.ShowMenu(currentUser).Wait();
                             break;
                         case "3":
-                            //
+                            await _viewMatchesMenu.ShowMenu(currentUser);
                             break;
                         case "4":
                             _settingsMenu.ShowMenu(currentUser);
