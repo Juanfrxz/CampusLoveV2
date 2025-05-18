@@ -27,52 +27,81 @@ namespace CampusLove.Application.UI
             _logInAdminMenu = new LogInAdminMenu(connection);
         }
 
-        public void ShowMenu()
+        public async Task ShowMenu()
         {
             bool exit = false;
 
             while (!exit)
             {
                 Console.Clear();
-                MainMenu.ShowHeader("Where is Love");
+                var title = new FigletText("💞 CampusLove")
+                    .Centered()
+                    .Color(Color.Blue);
 
-                Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Console.WriteLine("  ╔════════════════════════════════════════════╗");
-                Console.WriteLine("  ║                📋 MAIN MENU                ║");
-                Console.WriteLine("  ╠════════════════════════════════════════════╣");
-                Console.WriteLine("  ║     1️⃣  Sign Up                   📰        ║");
-                Console.WriteLine("  ║     2️⃣  Log In                    ☑️         ║");
-                Console.WriteLine("  ║     3️⃣  Administrator             🔑        ║");
-                Console.WriteLine("  ║     0️⃣  Exit                      ❌        ║");
-                Console.WriteLine("  ╚════════════════════════════════════════════╝");
-
-                Console.ResetColor();
-                Console.ForegroundColor = ConsoleColor.Gray;
-                string option = ReadText("\n✨ Select an option: ");
-
-                switch (option)
+                var panel = new Panel(title)
                 {
-                    case "1":
-                        _signupMenu.RegisterUser().Wait();
-                        break;
-                    case "2":
-                        _loginMenu.ValidateUser().Wait();
-                        break;
-                    case "3":
-                        _logInAdminMenu.ValidateAdmin().Wait();
-                        break;
-                    case "0":
-                        exit = true;
-                        break;
-                    default:
-                        ShowMessage("⚠️ Invalid option. Please try again.", ConsoleColor.Red);
-                        Console.ReadKey();
-                        break;  
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 1, 1, 1),
+                    Header = new PanelHeader(" Where is Love 💞 ", Justify.Center),
+                };
+
+                AnsiConsole.Write(panel);
+                AnsiConsole.WriteLine();
+
+                var menu = new SelectionPrompt<string>()
+                    .Title("[bold blue]Select an option:[/]")
+                    .PageSize(5)
+                    .AddChoices(new[]
+                    {
+                        "📰  Sign Up",
+                        "☑️   Log In",
+                        "🔑  Administrator",
+                        "❌  Exit"
+                    });
+
+                var option = AnsiConsole.Prompt(menu);
+
+                try
+                {
+                    switch (option)
+                    {
+                        case "📰  Sign Up":
+                            await _signupMenu.RegisterUser();
+                            break;
+                        case "☑️   Log In":
+                            await _loginMenu.ValidateUser();
+                            break;
+                        case "🔑  Administrator":
+                            await _logInAdminMenu.ValidateAdmin();
+                            break;
+                        case "❌  Exit":
+                            exit = true;
+                            var exitPanel = new Panel("[blue]👋 Exiting the application...[/]")
+                            {
+                                Border = BoxBorder.Rounded,
+                                BorderStyle = new Style(Color.Blue),
+                                Padding = new Padding(1, 1, 1, 1)
+                            };
+                            AnsiConsole.Write(exitPanel);
+                            await Task.Delay(1000);
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var errorPanel = new Panel($"[red]❌ Error: {ex.Message}[/]")
+                    {
+                        Border = BoxBorder.Rounded,
+                        BorderStyle = new Style(Color.Red),
+                        Padding = new Padding(1, 1, 1, 1)
+                    };
+                    AnsiConsole.Write(errorPanel);
+                    Console.ReadKey();
                 }
             }
 
             ShowMessage("\n👋 Thank you for using the application! Have a great day! 🌟", ConsoleColor.Blue);
-    }
+        }
 
         public static void ShowMessage(string message, ConsoleColor color)
         {
