@@ -146,7 +146,7 @@ namespace CampusLove.Application.UI
                 "👥  View Profiles",
                 "😍  Interact with Profiles",
                 "💞  View Matches",
-                "⚙️  Settings",
+                "⚙️   Settings",
                 "❌  Logout"
                     });
 
