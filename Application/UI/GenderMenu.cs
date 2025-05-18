@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CampusLove.Domain.Entities;
 using CampusLove.Infrastructure.Repositories;
 using MySql.Data.MySqlClient;
+using Spectre.Console;
 
 namespace CampusLove.Application.UI
 {
@@ -25,7 +26,7 @@ namespace CampusLove.Application.UI
             while (!returnTo)
             {
                 Console.Clear();
-                Console.WriteLine(" ⚧️ GENDER   MENU   ");
+                MainMenu.ShowTitle(" ⚧️ GENDER   MENU   ");
 
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("  ╔════════════════════════════════════════════╗");
@@ -74,7 +75,7 @@ namespace CampusLove.Application.UI
         private async Task ListGender()
         {
             Console.Clear();
-            Console.WriteLine("GENDER LIST");
+            MainMenu.ShowText("GENDER LIST");
 
             try
             {
@@ -86,25 +87,26 @@ namespace CampusLove.Application.UI
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("\n{0,-5} {1,-12}",
-                        "ID", "Description");
+                    var table = new Table();
 
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine(new string('-', 50));
-                    Console.ResetColor();
-
+                    table.Border(TableBorder.Rounded);
+                    table.BorderColor(Color.White);
+                    table.Title("[bold magenta]Gender List[/]");
+                    
+                    table.AddColumn(new TableColumn("[bold cyan]ID[/]").Centered());
+                    table.AddColumn(new TableColumn("[bold cyan]Description[/]").LeftAligned());
+                    
+                    // Add rows
                     foreach (var gender in genders)
                     {
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.WriteLine("{0,-5} {1,-12}",
-                            gender.Id,
-                            gender.Description);
+                        table.AddRow(
+                            $"[white]{gender.Id}[/]",
+                            $"[white]{gender.Description}[/]"
+                        );
                     }
-
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine(new string('-', 50));
-                    Console.ResetColor();
+                    
+                    // Render the table
+                    AnsiConsole.Write(table);
                 }
             }
             catch (Exception ex)
@@ -121,7 +123,7 @@ namespace CampusLove.Application.UI
         private async Task CreateGender()
         {
             Console.Clear();
-            Console.WriteLine("REGISTER NEW GENDER");
+            MainMenu.ShowText("REGISTER NEW GENDER");
 
             try
             {
@@ -138,7 +140,7 @@ namespace CampusLove.Application.UI
                 };
 
                 Console.Clear();
-                Console.WriteLine("GENDER INFORMATION");
+                MainMenu.ShowText("GENDER INFORMATION");
 
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine($"Description: {nombre}");
@@ -176,7 +178,7 @@ namespace CampusLove.Application.UI
         private async Task UpdateGender()
         {
             Console.Clear();
-            Console.WriteLine("UPDATE GENDER");
+            MainMenu.ShowText("UPDATE GENDER");
             
             try
             {
@@ -190,7 +192,7 @@ namespace CampusLove.Application.UI
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine($"\nCurrent Information:");
+                    MainMenu.ShowText($"\nCurrent Information:");
                     Console.WriteLine($"Gender ID: {gender.Id}");
                     Console.WriteLine($"Description: {gender.Description}");
                     Console.ResetColor();
@@ -202,7 +204,7 @@ namespace CampusLove.Application.UI
                     }
 
                     Console.Clear();
-                    Console.WriteLine("UPDATED GENDER INFORMATION");
+                    MainMenu.ShowText("UPDATED GENDER INFORMATION");
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine($"ID: {gender.Id}");
                     Console.WriteLine($"Description: {gender.Description}");
@@ -242,7 +244,7 @@ namespace CampusLove.Application.UI
         private async Task DeleteGender()
         {
             Console.Clear();
-            Console.WriteLine("DELETE GENDER");
+            MainMenu.ShowText("DELETE GENDER");
             
             try
             {
@@ -256,7 +258,7 @@ namespace CampusLove.Application.UI
                 else 
                 {
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine($"\nGender Information:");
+                    MainMenu.ShowText($"\nGender Information:");
                     Console.WriteLine($"ID: {gender.Id}");
                     Console.WriteLine($"Description: {gender.Description}");
                     Console.ResetColor();

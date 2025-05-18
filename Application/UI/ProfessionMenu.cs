@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CampusLove.Domain.Entities;
 using CampusLove.Infrastructure.Repositories;
 using MySql.Data.MySqlClient;
+using Spectre.Console;
 
 namespace CampusLove.Application.UI
 {
@@ -25,7 +26,7 @@ namespace CampusLove.Application.UI
             while (!returnTo)
             {
                 Console.Clear();
-                Console.WriteLine(" 🤓 PROFESSION MENU   ");
+                MainMenu.ShowTitle(" 🤓 PROFESSION MENU   ");
 
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("  ╔════════════════════════════════════════════╗");
@@ -74,7 +75,7 @@ namespace CampusLove.Application.UI
         private async Task ListProfession()
         {
             Console.Clear();
-            Console.WriteLine("PROFESSION LIST");
+            MainMenu.ShowText("PROFESSION LIST");
 
             try
             {
@@ -86,25 +87,24 @@ namespace CampusLove.Application.UI
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("\n{0,-5} {1,-12}",
-                        "ID", "Description");
+                    var table = new Table();
 
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine(new string('-', 50));
-                    Console.ResetColor();
+                    table.Border(TableBorder.Rounded);
+                    table.BorderColor(Color.White);
+                    table.Title("[bold magenta]Gender List[/]");
+                    
+                    table.AddColumn(new TableColumn("[bold cyan]ID[/]").Centered());
+                    table.AddColumn(new TableColumn("[bold cyan]Description[/]").LeftAligned());
 
                     foreach (var profession in professions)
                     {
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.WriteLine("{0,-5} {1,-12}",
-                            profession.Id,
-                            profession.Description);
+                        table.AddRow(
+                            $"[white]{profession.Id}[/]",
+                            $"[white]{profession.Description}[/]"
+                        );
                     }
 
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine(new string('-', 50));
-                    Console.ResetColor();
+                    AnsiConsole.Write(table);
                 }
             }
             catch (Exception ex)
@@ -121,7 +121,7 @@ namespace CampusLove.Application.UI
         private async Task CreateProfession()
         {
             Console.Clear();
-            Console.WriteLine("REGISTER NEW PROFESSION");
+            MainMenu.ShowText("REGISTER NEW PROFESSION");
 
             try
             {
@@ -176,7 +176,7 @@ namespace CampusLove.Application.UI
         private async Task UpdateProfession()
         {
             Console.Clear();
-            Console.WriteLine("UPDATE PROFESSION");
+            MainMenu.ShowText("UPDATE PROFESSION");
             
             try
             {
@@ -202,7 +202,7 @@ namespace CampusLove.Application.UI
                     }
 
                     Console.Clear();
-                    Console.WriteLine("UPDATED PROFESSION INFORMATION");
+                    MainMenu.ShowText("UPDATED PROFESSION INFORMATION");
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine($"ID: {profession.Id}");
                     Console.WriteLine($"Description: {profession.Description}");
@@ -242,7 +242,7 @@ namespace CampusLove.Application.UI
         private async Task DeleteProfession()
         {
             Console.Clear();
-            Console.WriteLine("DELETE PROFESSION");
+            MainMenu.ShowText("DELETE PROFESSION");
             
             try
             {

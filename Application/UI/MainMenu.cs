@@ -5,6 +5,8 @@ using CampusLove.Infrastructure.Configuration;
 using MySql.Data.MySqlClient;
 using CampusLove.Application.UI;
 using CampusLove.Domain.Entities;
+using Figgle;
+using Spectre.Console;
 
 namespace CampusLove.Application.UI
 {
@@ -32,7 +34,7 @@ namespace CampusLove.Application.UI
             while (!exit)
             {
                 Console.Clear();
-                Console.WriteLine("CampusLove ... Where is Love 💞");
+                MainMenu.ShowHeader("Where is Love");
 
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("  ╔════════════════════════════════════════════╗");
@@ -70,13 +72,43 @@ namespace CampusLove.Application.UI
             }
 
             ShowMessage("\n👋 Thank you for using the application! Have a great day! 🌟", ConsoleColor.Blue);
-        }
+    }
 
         public static void ShowMessage(string message, ConsoleColor color)
         {
             Console.ForegroundColor = color;
             Console.WriteLine($"\n{message}");
             Console.ResetColor();
+        }
+
+        public static void ShowHeader(string message)
+        {
+            var figlet = new FigletText(message)
+                .Centered()
+                .Color(Color.DarkMagenta);
+
+            var panel = new Panel(figlet)
+            {
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(1, 1, 1, 1),
+                Header = new PanelHeader(" 💞 CampusLove 💞 ", Justify.Center),
+            };
+
+            AnsiConsole.Write(panel);
+        }
+
+        public static void ShowTitle(string message)
+        {
+            AnsiConsole.WriteLine();
+            AnsiConsole.Write(new Rule($"[bold blue on white blink]{message}[/]").Centered());
+            AnsiConsole.WriteLine();
+        }
+
+        public static void ShowText(string message)
+        {
+            AnsiConsole.WriteLine();
+            AnsiConsole.Write(new Rule($"[bold purple on white blink]{message}[/]").LeftJustified());
+            AnsiConsole.WriteLine();
         }
 
         public static string ReadText(string prompt)

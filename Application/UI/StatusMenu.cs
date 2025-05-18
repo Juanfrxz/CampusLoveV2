@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using CampusLove.Domain.Entities;
 using CampusLove.Infrastructure.Repositories;
 using MySql.Data.MySqlClient;
+using Spectre.Console;
+using StatusEntity = CampusLove.Domain.Entities.Status;
 
 namespace CampusLove.Application.UI
 {
@@ -25,7 +27,7 @@ namespace CampusLove.Application.UI
             while (!returnTo)
             {
                 Console.Clear();
-                Console.WriteLine(" 👩‍❤️‍👩 STATUS MENU   ");
+                MainMenu.ShowTitle(" 👩‍❤️‍👩 STATUS MENU   ");
 
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("  ╔════════════════════════════════════════════╗");
@@ -74,7 +76,7 @@ namespace CampusLove.Application.UI
         private async Task ListStatus()
         {
             Console.Clear();
-            Console.WriteLine("STATUS LIST");
+            MainMenu.ShowText("STATUS LIST");
 
             try
             {
@@ -86,25 +88,24 @@ namespace CampusLove.Application.UI
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("\n{0,-5} {1,-12}",
-                        "ID", "Description");
-
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine(new string('-', 50));
-                    Console.ResetColor();
+                    var table = new Table();
+                    
+                    table.Border(TableBorder.Rounded);
+                    table.BorderColor(Color.White);
+                    table.Title("[bold magenta]Gender List[/]");
+                    
+                    table.AddColumn(new TableColumn("[bold cyan]ID[/]").Centered());
+                    table.AddColumn(new TableColumn("[bold cyan]Description[/]").LeftAligned());
 
                     foreach (var status in statuses)
                     {
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.WriteLine("{0,-5} {1,-12}",
-                        status.Id,
-                        status.Description);
+                        table.AddRow(
+                            $"[white]{status.Id}[/]",
+                            $"[white]{status.Description}[/]"
+                        );
                     }
 
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine(new string('-', 50));
-                    Console.ResetColor();
+                    AnsiConsole.Write(table);
                 }
             }
             catch (Exception ex)
@@ -121,7 +122,7 @@ namespace CampusLove.Application.UI
         private async Task CreateStatus()
         {
             Console.Clear();
-            Console.WriteLine("REGISTER NEW STATUS");
+            MainMenu.ShowText("REGISTER NEW STATUS");
 
             try
             {
@@ -132,7 +133,7 @@ namespace CampusLove.Application.UI
                     return;
                 }
 
-                var status = new Status
+                var status = new StatusEntity
                 {
                     Description = nombre
                 };
@@ -176,7 +177,7 @@ namespace CampusLove.Application.UI
         private async Task UpdateStatus()
         {
             Console.Clear();
-            Console.WriteLine("UPDATE STATUS");
+            MainMenu.ShowText("UPDATE STATUS");
             
             try
             {
@@ -242,7 +243,7 @@ namespace CampusLove.Application.UI
         private async Task DeleteStatus()
         {
             Console.Clear();
-            Console.WriteLine("DELETE STATUS");
+            MainMenu.ShowText("DELETE STATUS");
             
             try
             {

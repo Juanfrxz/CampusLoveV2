@@ -30,8 +30,7 @@ namespace CampusLove.Application.UI
             while (!returnToMain)
             {
                 Console.Clear();
-                Console.WriteLine("💘  INTERACT WITH PROFILES");
-                Console.WriteLine("------------------");
+                MainMenu.ShowTitle("💘  INTERACT WITH PROFILES");
 
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("  ╔════════════════════════════════════════════╗");
@@ -80,8 +79,7 @@ namespace CampusLove.Application.UI
         private async Task SelectGenderPreference()
         {
             Console.Clear();
-            Console.WriteLine("♀️ ♂️  SELECT GENDER PREFERENCE");
-            Console.WriteLine("------------------");
+            MainMenu.ShowText("♀️ ♂️  SELECT GENDER PREFERENCE");
 
             var genders = await _genderRepository.GetAllAsync();
             if (!genders.Any())
@@ -125,7 +123,7 @@ namespace CampusLove.Application.UI
             try
             {
                 Console.Clear();
-                Console.WriteLine("👥 Browsing Profiles...");
+                MainMenu.ShowText("👥 Browsing Profiles...");
                 
                 var profiles = await _profileRepository.GetAllAsync();
                 if (profiles == null || !profiles.Any())
@@ -197,7 +195,7 @@ namespace CampusLove.Application.UI
                         }
                     }
 
-                    Console.WriteLine("\nOptions:");
+                    MainMenu.ShowText("\nOptions:");
                     Console.WriteLine("1. Like ❤️");
                     Console.WriteLine("2. Skip ⏭️");
                     Console.WriteLine("3. Return to Menu ↩️");

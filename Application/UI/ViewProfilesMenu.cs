@@ -4,6 +4,7 @@ using System.Linq;
 using CampusLove.Domain.Entities;
 using CampusLove.Infrastructure.Repositories;
 using MySql.Data.MySqlClient;
+using Spectre.Console;
 
 namespace CampusLove.Application.UI
 {
@@ -36,7 +37,7 @@ namespace CampusLove.Application.UI
             while (!returnToMain)
             {
                 Console.Clear();
-                Console.WriteLine(" 🫂 VIEW PROFILES ");
+                MainMenu.ShowTitle(" 🫂 VIEW PROFILES ");
 
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
                 Console.WriteLine("  ╔════════════════════════════════════════════╗");
@@ -73,8 +74,7 @@ namespace CampusLove.Application.UI
         private async Task ViewAllProfiles()
         {
             Console.Clear();
-            Console.WriteLine("🫂 VIEW PROFILES");
-            Console.WriteLine("------------------");
+            MainMenu.ShowText("🫂 VIEW PROFILES");
 
             try
             {
@@ -87,7 +87,6 @@ namespace CampusLove.Application.UI
                 var genderDict = genders.ToDictionary(g => g.Id, g => g.Description);
                 var professionDict = professions.ToDictionary(p => p.Id, p => p.Description);
                 var statusDict = statuses.ToDictionary(s => s.Id, s => s.Description);
-                var interestDict = interests.ToDictionary(i => i.Id, i => i.Description);
 
                 // Load interests for each profile
                 foreach (var profile in profiles)
@@ -110,98 +109,116 @@ namespace CampusLove.Application.UI
                     return;
                 }
 
-                Console.WriteLine($"\nTotal profiles found: {profiles.Count}");
-                Console.WriteLine("------------------");
+                // Create a table for the summary view
+                var summaryTable = new Table();
+                summaryTable.Border(TableBorder.Rounded);
+                summaryTable.BorderColor(Color.Purple);
+                summaryTable.Title = new TableTitle("Profiles Summary", new Style(Color.Purple, Color.Default, Decoration.Bold));
+                summaryTable.Caption = new TableTitle($"Total profiles found: {profiles.Count}", new Style(Color.Yellow, Color.Default));
 
-                int counter = 0;
+                // Add columns with styling
+                summaryTable.AddColumn(new TableColumn("[bold cyan]ID[/]").Centered());
+                summaryTable.AddColumn(new TableColumn("[bold cyan]Name[/]").LeftAligned());
+                summaryTable.AddColumn(new TableColumn("[bold cyan]Gender[/]").LeftAligned());
+                summaryTable.AddColumn(new TableColumn("[bold cyan]Profession[/]").LeftAligned());
+                summaryTable.AddColumn(new TableColumn("[bold cyan]Status[/]").LeftAligned());
+                summaryTable.AddColumn(new TableColumn("[bold cyan]Likes[/]").Centered());
+
+                // Add rows to summary table
                 foreach (var profile in profiles)
                 {
-                    try
+                    summaryTable.AddRow(
+                        $"[white]{profile.Id}[/]",
+                        $"[white]{profile.Name} {profile.LastName}[/]",
+                        $"[white]{genderDict.GetValueOrDefault(profile.GenderId, "N/A")}[/]",
+                        $"[white]{professionDict.GetValueOrDefault(profile.ProfessionId, "N/A")}[/]",
+                        $"[white]{statusDict.GetValueOrDefault(profile.StatusId, "N/A")}[/]",
+                        $"[green]{profile.TotalLikes}[/]"
+                    );
+                }
+
+                // Display the summary table
+                AnsiConsole.Write(summaryTable);
+
+                // Ask if user wants to see detailed information
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                string viewDetails = MainMenu.ReadText("\nDo you want to view detailed information for a profile? (Y/N): ");
+                Console.ResetColor();
+
+                if (viewDetails.ToUpper() == "Y")
+                {
+                    while (true)
                     {
-                        Console.WriteLine("\n-----------------------------");
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"Name: {profile.Name ?? "N/A"} {profile.LastName ?? "N/A"}");
-                        Console.ResetColor();
+                        int profileId = MainMenu.ReadInteger("\nEnter profile ID to view details (0 to exit): ");
+                        if (profileId == 0) break;
 
-                        Console.WriteLine($"Identification: {profile.Identification ?? "N/A"}");
-                        Console.WriteLine($"Slogan: {profile.Slogan ?? "N/A"}");
-
-                        Console.ForegroundColor = ConsoleColor.Magenta;
-                        Console.WriteLine($"Gender: {genderDict.GetValueOrDefault(profile.GenderId, "N/A")}");
-                        Console.WriteLine($"Profession: {professionDict.GetValueOrDefault(profile.ProfessionId, "N/A")}");
-                        Console.WriteLine($"Status: {statusDict.GetValueOrDefault(profile.StatusId, "N/A")}");
-                        Console.ResetColor();
-
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"Total Likes: {profile.TotalLikes}");
-                        Console.WriteLine($"Created: {profile.createDate.ToShortDateString()}");
-                        Console.ResetColor();
-
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("\nInterests:");
-                        if (profile.Details.Any())
+                        var selectedProfile = profiles.FirstOrDefault(p => p.Id == profileId);
+                        if (selectedProfile == null)
                         {
-                            foreach (var detail in profile.Details)
-                            {
-                                Console.WriteLine($"- {detail.Interest?.Description ?? "N/A"}");
-                            }
+                            MainMenu.ShowMessage("❌ Profile not found.", ConsoleColor.Red);
+                            continue;
+                        }
+
+                        // Create a detailed view table
+                        var detailTable = new Table();
+                        detailTable.Border(TableBorder.Rounded);
+                        detailTable.BorderColor(Color.Blue);
+                        detailTable.Title = new TableTitle($"Profile Details - {selectedProfile.Name} {selectedProfile.LastName}", new Style(Color.Blue, Color.Default, Decoration.Bold));
+
+                        // Add sections for different types of information
+                        detailTable.AddColumn(new TableColumn("[bold magenta]Field[/]").LeftAligned());
+                        detailTable.AddColumn(new TableColumn("[bold magenta]Value[/]").LeftAligned());
+
+                        // Add profile information
+                        detailTable.AddRow("[bold yellow]Basic Information[/]", "");
+                        detailTable.AddRow("ID", $"[white]{selectedProfile.Id}[/]");
+                        detailTable.AddRow("Name", $"[white]{selectedProfile.Name} {selectedProfile.LastName}[/]");
+                        detailTable.AddRow("Identification", $"[white]{selectedProfile.Identification}[/]");
+                        detailTable.AddRow("Slogan", $"[white]{selectedProfile.Slogan}[/]");
+                        detailTable.AddRow("Created Date", $"[white]{selectedProfile.createDate.ToShortDateString()}[/]");
+
+                        detailTable.AddRow("[bold yellow]Profile Details[/]", "");
+                        detailTable.AddRow("Gender", $"[white]{genderDict.GetValueOrDefault(selectedProfile.GenderId, "N/A")}[/]");
+                        detailTable.AddRow("Profession", $"[white]{professionDict.GetValueOrDefault(selectedProfile.ProfessionId, "N/A")}[/]");
+                        detailTable.AddRow("Status", $"[white]{statusDict.GetValueOrDefault(selectedProfile.StatusId, "N/A")}[/]");
+                        detailTable.AddRow("Total Likes", $"[green]{selectedProfile.TotalLikes}[/]");
+
+                        detailTable.AddRow("[bold yellow]Interests[/]", "");
+                        if (selectedProfile.Details.Any())
+                        {
+                            string interestList = string.Join("\n", selectedProfile.Details.Select(d => $"• {d.Interest?.Description ?? "N/A"}"));
+                            detailTable.AddRow("", $"[white]{interestList}[/]");
                         }
                         else
                         {
-                            Console.WriteLine("- No interests listed");
+                            detailTable.AddRow("", "[white]No interests listed[/]");
                         }
-                        Console.ResetColor();
 
-                        Console.WriteLine("-----------------------------");
+                        // Display the detailed table
+                        AnsiConsole.Write(detailTable);
 
-                        if (++counter % 3 == 0)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.Write("\nPress any key to continue... (ESC to return to menu)");
-                            Console.ResetColor();
-
-                            var key = Console.ReadKey(true);
-                            if (key.Key == ConsoleKey.Escape)
-                            {
-                                return;
-                            }
-
-                            Console.Clear();
-                            Console.WriteLine("🫂 VIEW PROFILES");
-                            Console.WriteLine("------------------");
-                            Console.WriteLine($"Total profiles found: {profiles.Count}");
-                            Console.WriteLine("------------------");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MainMenu.ShowMessage($"\nError displaying profile {profile.Id}: {ex.Message}", ConsoleColor.Red);
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("\nPress any key to continue to next profile...");
+                        Console.Write("\nPress any key to continue...");
                         Console.ResetColor();
                         Console.ReadKey();
                     }
                 }
-
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\nPress any key to return to menu...");
-                Console.ResetColor();
-                Console.ReadKey();
             }
             catch (Exception ex)
             {
                 MainMenu.ShowMessage($"\nError accessing database: {ex.Message}", ConsoleColor.Red);
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("\nPress any key to return to menu...");
-                Console.ResetColor();
-                Console.ReadKey();
             }
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write("\nPress any key to return to menu...");
+            Console.ResetColor();
+            Console.ReadKey();
         }
 
         private async Task FindProfile()
         {
             Console.Clear();
-            Console.WriteLine(" SEARCH PROFILE ");
+            MainMenu.ShowText(" SEARCH PROFILE ");
 
             string name = MainMenu.ReadText("\nEnter name: ");
 
