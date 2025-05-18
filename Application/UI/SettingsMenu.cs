@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CampusLove.Domain.Entities;
 using CampusLove.Infrastructure.Repositories;
 using MySql.Data.MySqlClient;
+using Spectre.Console;
 
 namespace CampusLove.Application.UI
 {
@@ -30,40 +31,54 @@ namespace CampusLove.Application.UI
             while (!returnToMain)
             {
                 Console.Clear();
-                MainMenu.ShowTitle($"  ⚙️ SETTINGS MENU {currentUser.Username}");
 
-                Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Console.WriteLine("  ╔════════════════════════════════════════════╗");
-                Console.WriteLine("  ║             ⚙️  SETTINGS MENU               ║");
-                Console.WriteLine("  ╠════════════════════════════════════════════╣");
-                Console.WriteLine("  ║     1️⃣  View Profile             👤         ║");
-                Console.WriteLine("  ║     2️⃣  Edit Profile             ✏️          ║");
-                Console.WriteLine("  ║     3️⃣  Change Password          🔑         ║");
-                Console.WriteLine("  ║     0️⃣  Return to Menu           ↩️          ║");
-                Console.WriteLine("  ╚════════════════════════════════════════════╝");
+                // Título con Figlet y Panel
+                var title = new FigletText("⚙️ SETTINGS")
+                    .Centered()
+                    .Color(Color.Blue);
 
-                Console.ResetColor();
-                Console.ForegroundColor = ConsoleColor.Gray;
-                string option = MainMenu.ReadText("\n✨ Select an option: ");
+                var panel = new Panel(title)
+                {
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 1, 1, 1),
+                    Header = new PanelHeader($" Usuario: {currentUser.Username} ", Justify.Center),
+                };
+
+                AnsiConsole.Write(panel);
+                AnsiConsole.WriteLine();
+
+                // Menú interactivo con SelectionPrompt
+                var menu = new SelectionPrompt<string>()
+                    .Title("[bold blue]Selecciona una opción:[/]")
+                    .PageSize(4)
+                    .AddChoices(new[]
+                    {
+                        "👤  Ver Perfil",
+                        "✏️  Editar Perfil",
+                        "🔑  Cambiar Contraseña",
+                        "↩️  Volver al menú anterior"
+                    });
+
+                var option = AnsiConsole.Prompt(menu);
 
                 try
                 {
                     switch (option)
                     {
-                        case "1":
+                        case "👤  Ver Perfil":
                             await ViewProfile(currentUser);
                             break;
-                        case "2":
+                        case "✏️  Editar Perfil":
                             await EditProfile(currentUser);
                             break;
-                        case "3":
+                        case "🔑  Cambiar Contraseña":
                             await ChangePassword(currentUser);
                             break;
-                        case "0":
+                        case "↩️  Volver al menú anterior":
                             returnToMain = true;
                             break;
                         default:
-                            MainMenu.ShowMessage("⚠️ Invalid option. Please try again.", ConsoleColor.Red);
+                            MainMenu.ShowMessage("⚠️ Opción inválida. Intenta de nuevo.", ConsoleColor.Red);
                             Console.ReadKey();
                             break;
                     }
