@@ -18,7 +18,7 @@ namespace CampusLove.Infrastructure.Repositories
         public async Task<IEnumerable<User>> GetAllAsync()
         {
             var userList = new List<User>();
-            const string query = "SELECT id, username, password, profile_id, birthdate FROM user";
+            const string query = "SELECT id, username, password, profile_id, birthdate, bonus_likes FROM user";
 
             using var command = new MySqlCommand(query, _connection);
             using var reader = await command.ExecuteReaderAsync();
@@ -31,7 +31,8 @@ namespace CampusLove.Infrastructure.Repositories
                     Username = reader["username"].ToString() ?? string.Empty,
                     Password = reader["password"].ToString() ?? string.Empty,
                     ProfileId = Convert.ToInt32(reader["profile_id"]),
-                    Birthdate = Convert.ToDateTime(reader["birthdate"])
+                    Birthdate = Convert.ToDateTime(reader["birthdate"]),
+                    BonusLikes = Convert.ToInt32(reader["bonus_likes"])
                 });
             }
 
@@ -40,7 +41,7 @@ namespace CampusLove.Infrastructure.Repositories
 
         public async Task<User?> GetByIdAsync(object id)
         {
-            const string query = "SELECT id, username, password, profile_id, birthdate FROM user WHERE id = @Id";
+            const string query = "SELECT id, username, password, profile_id, birthdate, bonus_likes FROM user WHERE id = @Id";
 
             using var command = new MySqlCommand(query, _connection);
             command.Parameters.AddWithValue("@Id", id);
@@ -54,7 +55,8 @@ namespace CampusLove.Infrastructure.Repositories
                     Username = reader["username"].ToString() ?? string.Empty,
                     Password = reader["password"].ToString() ?? string.Empty,
                     ProfileId = Convert.ToInt32(reader["profile_id"]),
-                    Birthdate = Convert.ToDateTime(reader["birthdate"])
+                    Birthdate = Convert.ToDateTime(reader["birthdate"]),
+                    BonusLikes = Convert.ToInt32(reader["bonus_likes"])
                 };
             }
 
@@ -66,7 +68,7 @@ namespace CampusLove.Infrastructure.Repositories
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            const string query = "INSERT INTO user (username, password, profile_id, birthdate) VALUES (@Username, @Password, @ProfileId, @Birthdate)";
+            const string query = "INSERT INTO user (username, password, profile_id, birthdate, bonus_likes) VALUES (@Username, @Password, @ProfileId, @Birthdate, @BonusLikes)";
             using var transaction = await _connection.BeginTransactionAsync();
 
             try
@@ -76,6 +78,7 @@ namespace CampusLove.Infrastructure.Repositories
                 command.Parameters.AddWithValue("@Password", user.Password);
                 command.Parameters.AddWithValue("@ProfileId", user.ProfileId);
                 command.Parameters.AddWithValue("@Birthdate", user.Birthdate);
+                command.Parameters.AddWithValue("@BonusLikes", user.BonusLikes);
 
                 var result = await command.ExecuteNonQueryAsync() > 0;
                 await transaction.CommitAsync();
@@ -93,7 +96,7 @@ namespace CampusLove.Infrastructure.Repositories
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            const string query = "UPDATE user SET username = @Username, password = @Password, profile_id = @ProfileId, birthdate = @Birthdate WHERE id = @Id";
+            const string query = "UPDATE user SET username = @Username, password = @Password, profile_id = @ProfileId, birthdate = @Birthdate, bonus_likes = @BonusLikes WHERE id = @Id";
             using var transaction = await _connection.BeginTransactionAsync();
 
              try
@@ -103,6 +106,7 @@ namespace CampusLove.Infrastructure.Repositories
                 command.Parameters.AddWithValue("@Password", user.Password);
                 command.Parameters.AddWithValue("@ProfileId", user.ProfileId);
                 command.Parameters.AddWithValue("@Birthdate", user.Birthdate);
+                command.Parameters.AddWithValue("@BonusLikes", user.BonusLikes);
                 command.Parameters.AddWithValue("@Id", user.Id);
 
                 var result = await command.ExecuteNonQueryAsync() > 0;
@@ -142,7 +146,7 @@ namespace CampusLove.Infrastructure.Repositories
             if (string.IsNullOrWhiteSpace(username))
                 throw new ArgumentException("Username cannot be empty", nameof(username));
 
-            const string query = "SELECT id, username, password, profile_id, birthdate FROM user WHERE username = @Username";
+            const string query = "SELECT id, username, password, profile_id, birthdate, bonus_likes FROM user WHERE username = @Username";
 
             using var command = new MySqlCommand(query, _connection);
             command.Parameters.AddWithValue("@Username", username);
@@ -156,7 +160,8 @@ namespace CampusLove.Infrastructure.Repositories
                     Username = reader["username"].ToString() ?? string.Empty,
                     Password = reader["password"].ToString() ?? string.Empty,
                     ProfileId = Convert.ToInt32(reader["profile_id"]),
-                    Birthdate = Convert.ToDateTime(reader["birthdate"])
+                    Birthdate = Convert.ToDateTime(reader["birthdate"]),
+                    BonusLikes = Convert.ToInt32(reader["bonus_likes"])
                 };
             }
 
@@ -165,7 +170,7 @@ namespace CampusLove.Infrastructure.Repositories
 
         public async Task<User?> GetByProfileIdAsync(int profileId)
         {
-            const string query = "SELECT id, username, password, profile_id, birthdate FROM user WHERE profile_id = @ProfileId";
+            const string query = "SELECT id, username, password, profile_id, birthdate, bonus_likes FROM user WHERE profile_id = @ProfileId";
 
             using var command = new MySqlCommand(query, _connection);
             command.Parameters.AddWithValue("@ProfileId", profileId);
@@ -179,7 +184,8 @@ namespace CampusLove.Infrastructure.Repositories
                     Username = reader["username"].ToString() ?? string.Empty,
                     Password = reader["password"].ToString() ?? string.Empty,
                     ProfileId = Convert.ToInt32(reader["profile_id"]),
-                    Birthdate = Convert.ToDateTime(reader["birthdate"])
+                    Birthdate = Convert.ToDateTime(reader["birthdate"]),
+                    BonusLikes = Convert.ToInt32(reader["bonus_likes"])
                 };
             }
 
