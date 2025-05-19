@@ -14,6 +14,8 @@ namespace CampusLove.Application.UI
         private readonly GenderRepository _genderRepository;
         private readonly UserRepository _userRepository;
         private readonly UserLikesRepository _userLikesRepository;
+        private readonly UserMatchRepository _userMatchRepository;
+        private readonly UserDislikesRepository _userdislikesRepository;
         private int? _preferredGenderId;
         private const int MAX_LIKES = 10;
 
@@ -23,6 +25,8 @@ namespace CampusLove.Application.UI
             _genderRepository = new GenderRepository(connection);
             _userRepository = new UserRepository(connection);
             _userLikesRepository = new UserLikesRepository(connection);
+            _userMatchRepository = new UserMatchRepository(connection);
+            _userdislikesRepository = new UserDislikesRepository(connection);
         }
 
         public async Task ShowMenu(User currentUser)
@@ -212,7 +216,8 @@ namespace CampusLove.Application.UI
 
                     MainMenu.ShowText("\nOptions:");
                     Console.WriteLine("1. Like ❤️");
-                    Console.WriteLine("2. Skip ⏭️");
+                    Console.WriteLine("2. Dislike 👎");
+                    Console.WriteLine("3. Skip ⏭️");
                     Console.WriteLine("3. Return to Menu ↩️");
 
                     string option = MainMenu.ReadText("\nSelect an option: ");
@@ -222,8 +227,11 @@ namespace CampusLove.Application.UI
                             await HandleLike(currentUser, profile);
                             break;
                         case "2":
-                            continue;
+                            await HandleDislike(currentUser, profile);
+                            break;
                         case "3":
+                            continue;
+                        case "4":
                             return;
                         default:
                             MainMenu.ShowMessage("⚠️ Invalid option.", ConsoleColor.Red);
@@ -289,11 +297,91 @@ namespace CampusLove.Application.UI
 
         private async Task<bool> CheckForMatch(int userId, int likedProfileId)
         {
-            // Check if the profile that received the like also liked the user
-            var userProfile = await _profileRepository.GetByUserIdAsync(userId);
-            if (userProfile == null) return false;
+            try
+            {
+                // Check if the profile that received the like also liked the user
+                var userProfile = await _profileRepository.GetByUserIdAsync(userId);
+                if (userProfile == null) return false;
 
-            return await _userLikesRepository.HasUserLikedProfileAsync(likedProfileId, userProfile.Id);
+                bool hasLikedBack = await _userLikesRepository.HasUserLikedProfileAsync(likedProfileId, userProfile.Id);
+                
+                // If there's a match (both users liked each other), create a match record
+                if (hasLikedBack)
+                {
+                    // Get the user ID who owns the liked profile
+                    var otherUser = await _userRepository.GetByProfileIdAsync(likedProfileId);
+                    if (otherUser == null) return false;
+                    
+                    // Create the match record
+                    var match = new UserMatch
+                    {
+                        User1_id = userId,
+                        User2_id = otherUser.Id,
+                        MatchDate = DateTime.Now
+                    };
+                    
+                    await _userMatchRepository.InsertAsync(match);
+                    
+                    // Update the like status to mark it as a match
+                    var likes = await _userLikesRepository.GetLikesByUserIdAsync(userId);
+                    var thisLike = likes.FirstOrDefault(l => l.LikedProfileId == likedProfileId);
+                    if (thisLike != null)
+                    {
+                        await _userLikesRepository.UpdateMatchStatusAsync(thisLike.Id, true);
+                    }
+                    
+                    var otherLikes = await _userLikesRepository.GetLikesByUserIdAsync(otherUser.Id);
+                    var otherLike = otherLikes.FirstOrDefault(l => l.LikedProfileId == userProfile.Id);
+                    if (otherLike != null)
+                    {
+                        await _userLikesRepository.UpdateMatchStatusAsync(otherLike.Id, true);
+                    }
+                }
+                
+                return hasLikedBack;
+            }
+            catch (Exception ex)
+            {
+                MainMenu.ShowMessage($"❌ Error checking for match: {ex.Message}", ConsoleColor.Red);
+                return false;
+            }
+        }
+
+        private async Task HandleDislike(User currentUser, CampusLove.Domain.Entities.Profile dislikedProfile)
+        {
+            try
+            {
+                // Check if already disliked
+                bool hasDisliked = await _userdislikesRepository.HasUserDislikedProfileAsync(currentUser.Id, dislikedProfile.Id);
+                if (hasDisliked)
+                {
+                    MainMenu.ShowMessage("⚠️ You have already disliked this profile", ConsoleColor.Yellow);
+                    return;
+                }
+
+                // Create the dislike
+                var dislike = new UserDislikes
+                {
+                    UserId = currentUser.Id,
+                    DislikedProfileId = dislikedProfile.Id,
+                    DislikeDate = DateTime.UtcNow
+                };
+
+                var createdDislike = await _userdislikesRepository.CreateDislikeAsync(dislike);
+
+                if (createdDislike != null && createdDislike.Id > 0)
+                {
+                    MainMenu.ShowMessage("👎 Dislike sent!", ConsoleColor.Green);
+                }
+                else
+                {
+                    MainMenu.ShowMessage("❌ Failed to send dislike", ConsoleColor.Red);
+                }
+            }
+            catch (Exception ex)
+            {
+                MainMenu.ShowMessage($"❌ Error sending dislike: {ex.Message}", ConsoleColor.Red);
+            }
         }
     }
 }

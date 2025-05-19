@@ -15,6 +15,7 @@ namespace CampusLove.Application.UI
         private readonly SignUpMenu _signupMenu;
         private readonly LogInMenu _loginMenu;
         private readonly LogInAdminMenu _logInAdminMenu;
+        private readonly StatisticsMenu _statisticsMenu;
 
         public MainMenu()
         {
@@ -25,6 +26,7 @@ namespace CampusLove.Application.UI
             _signupMenu = new SignUpMenu(connection);
             _loginMenu = new LogInMenu(connection);
             _logInAdminMenu = new LogInAdminMenu(connection);
+            _statisticsMenu = new StatisticsMenu(connection);
         }
 
         public async Task ShowMenu()
@@ -56,6 +58,7 @@ namespace CampusLove.Application.UI
                         "📰  Sign Up",
                         "☑️   Log In",
                         "🔑  Administrator",
+                        "📶  Statistics",
                         "❌  Exit"
                     });
 
@@ -73,6 +76,9 @@ namespace CampusLove.Application.UI
                             break;
                         case "🔑  Administrator":
                             await _logInAdminMenu.ValidateAdmin();
+                            break;
+                        case "📶  Statistics":
+                            await _statisticsMenu.ShowStatistics();
                             break;
                         case "❌  Exit":
                             exit = true;
