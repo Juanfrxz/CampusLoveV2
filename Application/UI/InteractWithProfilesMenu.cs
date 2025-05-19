@@ -204,11 +204,12 @@ namespace CampusLove.Application.UI
                     }
                     else
                     {
-                        // Check like limit
+                        // Calculate remaining likes including bonus
                         int likeCount = await _userLikesRepository.GetLikeCountByUserIdAsync(currentUser.Id);
-                        Console.WriteLine($"\nRemaining likes today: {MAX_LIKES - likeCount}");
+                        int totalAllowed = MAX_LIKES + currentUser.BonusLikes;
+                        Console.WriteLine($"\nRemaining likes today: {totalAllowed - likeCount} (Base {MAX_LIKES} + Bonus {currentUser.BonusLikes})");
 
-                        if (likeCount >= MAX_LIKES)
+                        if (likeCount >= totalAllowed)
                         {
                             Console.WriteLine("\n❌ You have reached your daily like limit");
                         }
@@ -218,7 +219,7 @@ namespace CampusLove.Application.UI
                     Console.WriteLine("1. Like ❤️");
                     Console.WriteLine("2. Dislike 👎");
                     Console.WriteLine("3. Skip ⏭️");
-                    Console.WriteLine("3. Return to Menu ↩️");
+                    Console.WriteLine("4. Return to Menu ↩️");
 
                     string option = MainMenu.ReadText("\nSelect an option: ");
                     switch (option)
@@ -260,9 +261,10 @@ namespace CampusLove.Application.UI
                     return;
                 }
 
-                // Check like limit
+                // Check like limit including bonus
                 int likeCount = await _userLikesRepository.GetLikeCountByUserIdAsync(currentUser.Id);
-                if (likeCount >= MAX_LIKES)
+                int totalAllowed = MAX_LIKES + currentUser.BonusLikes;
+                if (likeCount >= totalAllowed)
                 {
                     MainMenu.ShowMessage("❌ You have reached your daily like limit", ConsoleColor.Red);
                     return;
@@ -277,6 +279,12 @@ namespace CampusLove.Application.UI
                 };
 
                 await _userLikesRepository.CreateLikeAsync(like);
+                // Deduct bonus like if using bonus beyond base limit
+                if (likeCount >= MAX_LIKES)
+                {
+                    currentUser.BonusLikes--;
+                    await _userRepository.UpdateAsync(currentUser);
+                }
 
                 // Check for match
                 bool isMatch = await CheckForMatch(currentUser.Id, likedProfile.Id);
