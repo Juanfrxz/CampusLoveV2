@@ -83,6 +83,16 @@ CREATE TABLE IF NOT EXISTS userlikes (
     UNIQUE KEY unique_like (user_id, liked_profile_id)
 );
 
+CREATE TABLE IF NOT EXISTS userdislike (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    disliked_profile_id INT NOT NULL,
+    dislike_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT user_dislikes_FK FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT profile_dislikes_FK FOREIGN KEY (disliked_profile_id) REFERENCES profile(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE KEY unique_like (user_id, disliked_profile_id)
+);
+
 CREATE TABLE IF NOT EXISTS interestProfile (
     profile_id INT,
     interest_id INT,
