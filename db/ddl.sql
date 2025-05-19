@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS user (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) UNIQUE,
     password VARCHAR(50),
+    bonus_likes INT DEFAULT 0,
     profile_id INT,
     birthdate DATE,
     CONSTRAINT profile_id_FK FOREIGN KEY (profile_id) REFERENCES profile(id) ON DELETE CASCADE ON UPDATE CASCADE
