@@ -219,7 +219,7 @@ namespace CampusLove.Application.UI
                     Console.WriteLine("1. Like ❤️");
                     Console.WriteLine("2. Dislike 👎");
                     Console.WriteLine("3. Skip ⏭️");
-                    Console.WriteLine("3. Return to Menu ↩️");
+                    Console.WriteLine("4. Return to Menu ↩️");
 
                     string option = MainMenu.ReadText("\nSelect an option: ");
                     switch (option)

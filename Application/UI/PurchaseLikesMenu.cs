@@ -22,7 +22,7 @@ namespace CampusLove.Application.UI
             while (!returnToMenu)
             {
                 Console.Clear();
-                var title = new FigletText("💳 COMPRAR LIKES")
+                var title = new FigletText("💳 BUY LIKES")
                     .Centered()
                     .Color(Color.Green);
 
@@ -36,14 +36,14 @@ namespace CampusLove.Application.UI
                 AnsiConsole.WriteLine();
 
                 var menu = new SelectionPrompt<string>()
-                    .Title("[bold green]Seleccione un paquete de likes:[/]")
+                    .Title("[bold green]Select a package of likes:[/]")
                     .PageSize(5)
                     .AddChoices(new[]
                     {
                         "5 Likes - $1",
                         "10 Likes - $1.8",
                         "20 Likes - $3",
-                        "↩️ Volver al menú"
+                        "↩️ Back to menu"
                     });
                 var option = AnsiConsole.Prompt(menu);
                 int likesToAdd = 0;
@@ -58,20 +58,21 @@ namespace CampusLove.Application.UI
                     case "20 Likes - $3":
                         likesToAdd = 20;
                         break;
-                    case "↩️ Volver al menú":
+                    case "↩️ Back to menu":
                         returnToMenu = true;
                         continue;
                 }
 
                 // Simulación de pago
-                string cardNumber = MainMenu.ReadText("\nIngrese número de tarjeta de crédito/débito: ").Trim();
+                string cardNumber = MainMenu.ReadText("\nEnter your credit/debit card number: ").Trim();
                 string cardType = GetCardType(cardNumber);
-                MainMenu.ShowMessage($"\nDetectado: {cardType}", ConsoleColor.Cyan);
-                Console.Write("\nPresione Enter para simular pago...");
+                string cardEmoji = GetCardEmoji(cardType);
+                MainMenu.ShowMessage($"\nDetected: {cardType} {cardEmoji}", ConsoleColor.Cyan);
+                Console.Write("\nPress Enter to simulate payment...");
                 Console.ReadKey(true);
 
-                // Procesamiento simulado
-                AnsiConsole.Markup("[green]Procesando pago...[/]");
+                // Simulated processing
+                AnsiConsole.Markup("[green]Processing payment...[/]");
                 await Task.Delay(1000);
                 AnsiConsole.MarkupLine(" [green]✔[/]");
 
@@ -79,20 +80,32 @@ namespace CampusLove.Application.UI
                 currentUser.BonusLikes += likesToAdd;
                 await _userRepository.UpdateAsync(currentUser);
 
-                MainMenu.ShowMessage($"\n✅ Compra exitosa! +{likesToAdd} bonus likes.", ConsoleColor.Green);
-                Console.Write("\nPresione cualquier tecla para continuar...");
+                MainMenu.ShowMessage($"\n✅ Purchase successful! +{likesToAdd} bonus likes.", ConsoleColor.Green);
+                Console.Write("\nPress any key to continue...");
                 Console.ReadKey(true);
             }
         }
 
         private string GetCardType(string number)
         {
-            if (string.IsNullOrWhiteSpace(number)) return "Desconocida";
+            if (string.IsNullOrWhiteSpace(number)) return "Unknown";
             if (number.StartsWith("4")) return "Visa";
             if (number.StartsWith("5")) return "MasterCard";
             if (number.StartsWith("34") || number.StartsWith("37")) return "American Express";
             if (number.StartsWith("6")) return "Discover";
-            return "Desconocida";
+            return "Unknown";
+        }
+
+        private string GetCardEmoji(string cardType)
+        {
+            return cardType switch
+            {
+                "Visa" => "💳",
+                "MasterCard" => "💳",
+                "American Express" => "💳",
+                "Discover" => "💳",
+                _ => ""
+            };
         }
     }
 } 
