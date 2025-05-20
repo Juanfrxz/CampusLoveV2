@@ -44,6 +44,11 @@ Una plataforma de citas universitaria desarrollada en C# y .NET 8, diseñada par
 
 ---
 
+## Diagramas
+- [Diagrama ER](https://www.mermaidchart.com/raw/00fbe82a-ede9-4354-9372-93d747f6d7ed?theme=light&version=v0.1&format=svg)
+- [Diagrama Físico](./db/Diagrama.png)
+- [Clases](https://www.mermaidchart.com/raw/7b8cdee8-a5e4-4c3f-bf70-7e5d7352f903?theme=light&version=v0.1&format=svg)
+
 ## 📦 Instalación y ejecución
 
 1. Clona el repositorio:
@@ -302,11 +307,8 @@ INSERT INTO daily_likes (date, profile_id, number_likes, status) VALUES
 (CURDATE(), 11, 2, TRUE),
 (CURDATE(), 12, 5, TRUE);
 
---Insertar aplicación
-INSERT INTO application (name, description) VALUES ('CampusLove', 'Aplicación que permite el emparejamiento de usuarios.');--Insertar aplicación
 INSERT INTO application (name, description) VALUES ('CampusLove', 'Aplicación que permite el emparejamiento de usuarios.');
 
--- Insertar administrador
 INSERT INTO administrator (name, lastname, identification, username, password, application_id) VALUES ('Laura', 'Vargas', '123456789', 'lau22', '123', 1), ('Juan', 'Rodriguez', '987654321', 'Juanxx', '456', 1);
 ```
 ---
