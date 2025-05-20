@@ -20,6 +20,8 @@ namespace CampusLove.Application.UI
         private readonly InteractWithProfilesMenu _interactMenu;
         private readonly ViewProfilesMenu _viewprofilesMenu;
         private readonly ViewMatchesMenu _viewMatchesMenu;
+        private readonly PurchaseLikesMenu _purchaseLikesMenu;
+        private readonly ChatMenu _chatMenu;
 
         public LogInMenu(MySqlConnection connection)
         {
@@ -31,6 +33,8 @@ namespace CampusLove.Application.UI
             _interactMenu = new InteractWithProfilesMenu(connection);
             _viewprofilesMenu = new ViewProfilesMenu(connection);
             _viewMatchesMenu = new ViewMatchesMenu(connection);
+            _purchaseLikesMenu = new PurchaseLikesMenu(connection);
+            _chatMenu = new ChatMenu(connection);
         }
 
         public async Task ValidateUser()
@@ -140,13 +144,15 @@ namespace CampusLove.Application.UI
 
                 var menu = new SelectionPrompt<string>()
                     .Title("[bold blue]Select an option:[/]")
-                    .PageSize(5)
+                    .PageSize(7)
                     .AddChoices(new[]
                     {
                 "👥  View Profiles",
                 "😍  Interact with Profiles",
                 "💞  View Matches",
+                "💳  Buy likes",
                 "⚙️   Settings",
+                "💬  Chat",
                 "❌  Logout"
                     });
 
@@ -165,8 +171,14 @@ namespace CampusLove.Application.UI
                         case "💞  View Matches":
                             await _viewMatchesMenu.ShowMenu(currentUser);
                             break;
+                        case "💳  Buy likes":
+                            await _purchaseLikesMenu.ShowMenu(currentUser);
+                            break;
                         case "⚙️   Settings":
                             await _settingsMenu.ShowMenu(currentUser);
+                            break;
+                        case "💬  Chat":
+                            await _chatMenu.ShowMenu(currentUser);
                             break;
                         case "❌  Logout":
                             returnToMain = true;

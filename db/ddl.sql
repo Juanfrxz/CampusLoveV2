@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS user (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) UNIQUE,
     password VARCHAR(50),
+    bonus_likes INT DEFAULT 0,
     profile_id INT,
     birthdate DATE,
     CONSTRAINT profile_id_FK FOREIGN KEY (profile_id) REFERENCES profile(id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -117,5 +118,16 @@ CREATE TABLE IF NOT EXISTS daily_likes (
     number_likes INT CHECK (number_likes <= 10),
     status BOOLEAN DEFAULT TRUE,
     CONSTRAINT profile_daily_likes_FK FOREIGN KEY (profile_id) REFERENCES profile(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Mensajes privados entre usuarios
+CREATE TABLE IF NOT EXISTS message (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    text TEXT,
+    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_message_sender FOREIGN KEY (sender_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_message_receiver FOREIGN KEY (receiver_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE
 ); 
 
