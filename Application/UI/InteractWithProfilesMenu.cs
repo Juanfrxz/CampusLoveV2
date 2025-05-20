@@ -307,29 +307,25 @@ namespace CampusLove.Application.UI
         {
             try
             {
-                // Check if the profile that received the like also liked the user
                 var userProfile = await _profileRepository.GetByUserIdAsync(userId);
                 if (userProfile == null) return false;
 
-                bool hasLikedBack = await _userLikesRepository.HasUserLikedProfileAsync(likedProfileId, userProfile.Id);
-                
-                // If there's a match (both users liked each other), create a match record
+                var otherUser = await _userRepository.GetByProfileIdAsync(likedProfileId);
+                if (otherUser == null) return false;
+
+                bool hasLikedBack = await _userLikesRepository.HasUserLikedProfileAsync(otherUser.Id, userProfile.Id);
+
                 if (hasLikedBack)
                 {
-                    // Get the user ID who owns the liked profile
-                    var otherUser = await _userRepository.GetByProfileIdAsync(likedProfileId);
-                    if (otherUser == null) return false;
-                    
-                    // Create the match record
                     var match = new UserMatch
                     {
                         User1_id = userId,
                         User2_id = otherUser.Id,
                         MatchDate = DateTime.Now
                     };
-                    
+
                     await _userMatchRepository.InsertAsync(match);
-                    
+
                     // Update the like status to mark it as a match
                     var likes = await _userLikesRepository.GetLikesByUserIdAsync(userId);
                     var thisLike = likes.FirstOrDefault(l => l.LikedProfileId == likedProfileId);
@@ -337,7 +333,7 @@ namespace CampusLove.Application.UI
                     {
                         await _userLikesRepository.UpdateMatchStatusAsync(thisLike.Id, true);
                     }
-                    
+
                     var otherLikes = await _userLikesRepository.GetLikesByUserIdAsync(otherUser.Id);
                     var otherLike = otherLikes.FirstOrDefault(l => l.LikedProfileId == userProfile.Id);
                     if (otherLike != null)
@@ -345,7 +341,7 @@ namespace CampusLove.Application.UI
                         await _userLikesRepository.UpdateMatchStatusAsync(otherLike.Id, true);
                     }
                 }
-                
+
                 return hasLikedBack;
             }
             catch (Exception ex)
